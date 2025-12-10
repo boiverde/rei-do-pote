@@ -1,0 +1,178 @@
+"use client";
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import Link from 'next/link';
+import styles from './page.module.css';
+import dynamic from 'next/dynamic';
+
+import DepositModal from '../components/DepositModal';
+
+const PortfolioChart = dynamic(() => import('../components/PortfolioChart'), { ssr: false });
+
+export default function Portfolio() {
+    const [positions, setPositions] = useState([]);
+    const [balance, setBalance] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+
+    // Mock History Data (Keep for visual until we have real history table)
+    const generateBalanceHistory = () => {
+        const history = [];
+        let currentBalance = 900;
+        const today = new Date();
+        for (let i = 30; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const change = (Math.random() - 0.4) * 50;
+            currentBalance += change;
+            history.push({
+                date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                balance: parseFloat(currentBalance.toFixed(2))
+            });
+        }
+        return history;
+    };
+    const historyData = generateBalanceHistory();
+
+    const fetchPortfolio = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            setLoading(false);
+            // Optionally redirect here if we want to force login
+            // window.location.href = '/login'; 
+            return;
+        }
+
+        // 1. Fetch User Profile for Balance
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('balance')
+            .eq('id', session.user.id)
+            .single();
+
+        if (profile) setBalance(profile.balance);
+
+        // 2. Fetch User Positions
+        const { data: positionsData, error } = await supabase
+            .from('positions')
+            .select(`
+                    *,
+                    markets (
+                        home_team,
+                        away_team,
+                        home_price,
+                        away_price
+                    )
+                `)
+            .eq('user_id', session.user.id);
+
+        if (positionsData) {
+            const formattedPositions = positionsData.map(pos => {
+                const market = pos.markets;
+                // Determine current price for the outcome we hold
+                const isHome = pos.outcome === market.home_team;
+                const currentPrice = isHome ? market.home_price : market.away_price;
+
+                // Calc Return
+                const cost = pos.shares * pos.avg_price;
+                const currentValue = pos.shares * currentPrice;
+                const profit = currentValue - cost;
+                const returnStr = `${profit >= 0 ? '+' : '-'}R$ ${Math.abs(profit).toFixed(2)}`;
+
+                return {
+                    id: pos.market_id,
+                    market: `${market.home_team} vs ${market.away_team}`,
+                    outcome: pos.outcome,
+                    shares: pos.shares,
+                    avgPrice: pos.avg_price,
+                    currentPrice: currentPrice,
+                    return: returnStr,
+                    isProfit: profit >= 0
+                };
+            });
+            setPositions(formattedPositions);
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchPortfolio();
+    }, []);
+
+    const handleDepositSuccess = () => {
+        fetchPortfolio(); // Refresh balance
+    };
+
+    if (loading) return <div className={styles.container}>Carregando carteira...</div>;
+
+    const totalInvested = positions.reduce((acc, pos) => acc + (pos.shares * pos.avgPrice), 0);
+
+    return (
+        <div className={styles.container}>
+            <h1 className={styles.title}>Minha Carteira</h1>
+
+            <div className={styles.balanceCard}>
+                <div className={styles.balanceHeader}>
+                    <span>Saldo Disponível</span>
+                    <button
+                        className={styles.depositBtn}
+                        onClick={() => setIsDepositModalOpen(true)}
+                    >
+                        + Depositar
+                    </button>
+                </div>
+                <div className={styles.balanceAmount}>R$ {balance.toFixed(2).replace('.', ',')}</div>
+                <div className={styles.balanceMeta}>Investido: R$ {totalInvested.toFixed(2).replace('.', ',')}</div>
+
+                <div className={styles.chartWrapper}>
+                    <PortfolioChart data={historyData} />
+                </div>
+            </div>
+
+            <div className={styles.sectionTitle}>Posições Abertas ({positions.length})</div>
+
+            <div className={styles.list}>
+                {positions.length > 0 ? (
+                    positions.map((pos) => (
+                        <Link href={`/market/${pos.id}`} key={pos.id + pos.outcome} className={styles.positionCard}>
+                            <div className={styles.posHeader}>
+                                <span className={styles.marketName}>{pos.market}</span>
+                                <span className={`${styles.outcomeBadge} ${styles.greenBadge}`}>
+                                    {pos.outcome}
+                                </span>
+                            </div>
+                            <div className={styles.posStats}>
+                                <div className={styles.stat}>
+                                    <span>Cotas</span>
+                                    <strong>{pos.shares}</strong>
+                                </div>
+                                <div className={styles.stat}>
+                                    <span>Preço Médio</span>
+                                    <strong>{pos.avgPrice.toFixed(2)}</strong>
+                                </div>
+                                <div className={styles.stat}>
+                                    <span>Atual</span>
+                                    <strong>{pos.currentPrice.toFixed(2)}</strong>
+                                </div>
+                                <div className={styles.stat}>
+                                    <span>Retorno</span>
+                                    <strong className={pos.isProfit ? styles.green : styles.red}>
+                                        {pos.return}
+                                    </strong>
+                                </div>
+                            </div>
+                        </Link>
+                    ))
+                ) : (
+                    <div className={styles.emptyState}>Você ainda não fez nenhum investimento.</div>
+                )}
+            </div>
+
+            <DepositModal
+                isOpen={isDepositModalOpen}
+                onClose={() => setIsDepositModalOpen(false)}
+                onSuccess={handleDepositSuccess}
+            />
+        </div>
+    );
+}

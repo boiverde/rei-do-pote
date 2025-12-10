@@ -1,0 +1,133 @@
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: white;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    margin-bottom: 0;
+    /* Remove bottom margin to align with button */
+    font-size: 2rem;
+    background: linear-gradient(90deg, #fff, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.syncBtn {
+    background: #7bdcb5;
+    /* Purple/Blue distinctive */
+    color: #000;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(123, 220, 181, 0.3);
+    transition: transform 0.2s;
+}
+
+.syncBtn:hover {
+    transform: translateY(-2px);
+    background: #5bc8a0;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #888;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    /* Glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.card h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.row {
+    display: flex;
+    gap: 1rem;
+}
+
+.row>div {
+    flex: 1;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.group label {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.group input,
+.group select {
+    background: #111;
+    border: 1px solid #333;
+    padding: 0.8rem;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+}
+
+.group input:focus,
+.group select:focus {
+    border-color: #00b341;
+}
+
+.group small {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.submitBtn {
+    background: #00b341;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 1rem;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #009933;
+}
+
+.submitBtn:disabled {
+    background: #2a4030;
+    color: #666;
+    cursor: not-allowed;
+}

@@ -1,0 +1,134 @@
+.container {
+    padding: 32px 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.title {
+    margin-bottom: 24px;
+}
+
+.balanceCard {
+    background: linear-gradient(135deg, var(--card-bg), #2a2a35);
+    border: 1px solid var(--card-border);
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+}
+
+.balanceHeader {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.depositBtn {
+    background: #00b341;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.depositBtn:hover {
+    background: #009933;
+}
+
+.balanceAmount {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.balanceMeta {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.positionCard {
+    display: block;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 16px;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+}
+
+.positionCard:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.posHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.marketName {
+    font-weight: 600;
+}
+
+.outcomeBadge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.greenBadge {
+    background: rgba(0, 230, 118, 0.1);
+    color: var(--primary);
+}
+
+.redBadge {
+    background: rgba(255, 82, 82, 0.1);
+    color: var(--danger);
+}
+
+.posStats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.stat span {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.green {
+    color: var(--primary);
+}
+
+.red {
+    color: var(--danger);
+}
