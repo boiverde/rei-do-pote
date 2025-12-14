@@ -1,12 +1,13 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "BolaObr",
-  description: "O primeiro mercado de previsão do futebol brasileiro.",
+  title: "Rei do Pote",
+  description: "Market prediction platform",
 };
 
 export default function RootLayout({ children }) {
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
         <main className="container">
           {children}
         </main>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

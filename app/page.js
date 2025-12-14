@@ -1,9 +1,9 @@
-"use client";
-import { useState, useEffect } from 'react';
-import { supabase } from './lib/supabase'; // Import Supabase client
+import { supabase } from './lib/supabase';
 import MarketCard from './components/MarketCard';
 import styles from './page.module.css';
+import Link from 'next/link';
 
+// Constants for Filtering
 const FILTER_GROUPS = {
   "Todos": [],
   "Nacional": ["Brasileirão", "Copa do Brasil"],
@@ -17,72 +17,45 @@ const FILTER_GROUPS = {
   "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes"]
 };
 
-export default function Home() {
-  const [selectedGroup, setSelectedGroup] = useState("Todos");
-  const [selectedLeague, setSelectedLeague] = useState(null);
-  const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
+// Data Fetching logic (Server Side)
+async function getMarkets() {
+  const { data, error } = await supabase.from('markets').select('*');
+  if (error) {
+    console.error('Error fetching markets:', error);
+    return [];
+  }
+  return data.map(m => ({
+    id: m.id,
+    homeTeam: m.home_team,
+    awayTeam: m.away_team,
+    league: m.league,
+    eventDate: m.event_date,
+    homePrice: m.home_price,
+    awayPrice: m.away_price,
+    volume: `R$ ${(m.volume / 1000).toFixed(1)}K`
+  }));
+}
 
-  useEffect(() => {
-    const fetchMarkets = async () => {
-      try {
-        // Timeout promise
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+// Server Component
+export default async function Home({ searchParams }) {
+  // Wait for searchParams (Next.js 15 requirement)
+  const params = await searchParams;
+  const initialGroup = params?.group || "Todos";
+  const initialLeague = params?.league || null;
 
-        // Data fetch promise
-        const fetchPromise = supabase.from('markets').select('*');
+  const matches = await getMarkets();
 
-        const { data, error } = await Promise.race([fetchPromise, timeout]);
-
-        if (error) {
-          console.error('Error fetching markets:', error);
-        } else if (data) {
-          // Map DB columns (snake_case) to Component props (camelCase)
-          const mappedMatches = data.map(m => ({
-            id: m.id,
-            homeTeam: m.home_team,
-            awayTeam: m.away_team,
-            league: m.league,
-            eventDate: m.event_date,
-            homePrice: m.home_price,
-            awayPrice: m.away_price,
-            volume: `R$ ${(m.volume / 1000).toFixed(1)}K` // Simple formatter
-          }));
-          setMatches(mappedMatches);
-        }
-      } catch (err) {
-        console.error('Fetch failed or timed out:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMarkets();
-  }, []);
-
-  const handleGroupChange = (group) => {
-    setSelectedGroup(group);
-    setSelectedLeague(null); // Reset sub-filter when changing group
-  };
-
+  // Filter Logic (Now happens on render, or we could filter in DB for efficiency in future)
   const filteredMatches = matches.filter(match => {
-    // 1. Filter by Group
-    if (selectedGroup !== "Todos") {
-      const groupLeagues = FILTER_GROUPS[selectedGroup];
+    if (initialGroup !== "Todos") {
+      const groupLeagues = FILTER_GROUPS[initialGroup];
       if (!groupLeagues.includes(match.league)) return false;
     }
-
-    // 2. Filter by Specific League (if selected)
-    if (selectedLeague) {
-      return match.league === selectedLeague;
+    if (initialLeague) {
+      return match.league === initialLeague;
     }
-
     return true;
   });
-
-  if (loading) {
-    return <div className={styles.main}><div className={styles.hero}>Carregando mercados...</div></div>;
-  }
 
   return (
     <main className={styles.main}>
@@ -90,36 +63,36 @@ export default function Home() {
         <h1 className={styles.title}>Futebol Brasileiro</h1>
         <p className={styles.subtitle}>Negocie o resultado dos principais jogos da rodada.</p>
 
-        {/* Primary Filter (Groups) */}
+        {/* Filter Navigation - Using Links for Server Component interactivity */}
         <div className={styles.filterBar}>
           {Object.keys(FILTER_GROUPS).map(group => (
-            <button
+            <Link
               key={group}
-              className={`${styles.filterBtn} ${selectedGroup === group ? styles.activeFilter : ''}`}
-              onClick={() => handleGroupChange(group)}
+              href={`/?group=${group}`}
+              className={`${styles.filterBtn} ${initialGroup === group ? styles.activeFilter : ''}`}
             >
               {group}
-            </button>
+            </Link>
           ))}
         </div>
 
-        {/* Secondary Filter (Subcategories) - Only if not "Todos" */}
-        {selectedGroup !== "Todos" && (
+        {/* Sub-Filters */}
+        {initialGroup !== "Todos" && (
           <div className={styles.subFilterBar}>
-            <button
-              className={`${styles.subFilterBtn} ${selectedLeague === null ? styles.activeSubFilter : ''}`}
-              onClick={() => setSelectedLeague(null)}
+            <Link
+              href={`/?group=${initialGroup}`}
+              className={`${styles.subFilterBtn} ${initialLeague === null ? styles.activeSubFilter : ''}`}
             >
-              Tudo de {selectedGroup}
-            </button>
-            {FILTER_GROUPS[selectedGroup].map(league => (
-              <button
+              Tudo de {initialGroup}
+            </Link>
+            {FILTER_GROUPS[initialGroup].map(league => (
+              <Link
                 key={league}
-                className={`${styles.subFilterBtn} ${selectedLeague === league ? styles.activeSubFilter : ''}`}
-                onClick={() => setSelectedLeague(league)}
+                href={`/?group=${initialGroup}&league=${league}`}
+                className={`${styles.subFilterBtn} ${initialLeague === league ? styles.activeSubFilter : ''}`}
               >
                 {league}
-              </button>
+              </Link>
             ))}
           </div>
         )}

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import styles from './OrderForm.module.css';
 
 export default function OrderForm({ match }) {
@@ -24,7 +25,8 @@ export default function OrderForm({ match }) {
         // 1. Check if user is logged in
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-            alert("Você precisa estar logado para negociar!");
+            toast.error("Você precisa estar logado para negociar!");
+            setLoading(false);
             router.push('/login');
             return;
         }
@@ -38,17 +40,17 @@ export default function OrderForm({ match }) {
         });
 
         if (error) {
-            alert(`Erro na compra: ${error.message}`);
+            toast.error(`Erro na compra: ${error.message}`);
             setLoading(false);
             return;
         }
 
         if (data && data.success) {
-            alert(`Compra realizada com sucesso! Novo saldo: R$ ${data.new_balance.toFixed(2)}`);
-            router.refresh(); // Refresh page to update data if needed
-            router.push('/portfolio'); // Go to portfolio to see position
+            toast.success(`Compra realizada! Novo saldo: R$ ${data.new_balance.toFixed(2)}`);
+            router.refresh();
+            router.push('/portfolio');
         } else {
-            alert(`Falha na compra: ${data?.message || 'Erro desconhecido'}`);
+            toast.error(`Falha na compra: ${data?.message || 'Erro desconhecido'}`);
         }
         setLoading(false);
     };

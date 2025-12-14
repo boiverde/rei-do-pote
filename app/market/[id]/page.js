@@ -31,6 +31,22 @@ async function getMatch(id) {
     };
 }
 
+export async function generateMetadata({ params }) {
+    const resolvedParams = await params;
+    const match = await getMatch(resolvedParams.id);
+
+    if (!match) {
+        return {
+            title: 'Mercado não encontrado | Rei do Pote',
+        };
+    }
+
+    return {
+        title: `${match.homeTeam} vs ${match.awayTeam} | Rei do Pote`,
+        description: `Negocie cotas para ${match.homeTeam} x ${match.awayTeam}. Preço atual: ${match.homeTeam} R$ ${match.homePrice} | ${match.awayTeam} R$ ${match.awayPrice}.`,
+    };
+}
+
 export default async function MarketPage({ params }) {
     // Next.js 15: params is a Promise
     const resolvedParams = await params;

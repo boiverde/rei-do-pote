@@ -6,6 +6,7 @@ import styles from './page.module.css';
 import dynamic from 'next/dynamic';
 
 import DepositModal from '../components/DepositModal';
+import Skeleton from '../components/Skeleton';
 
 const PortfolioChart = dynamic(() => import('../components/PortfolioChart'), { ssr: false });
 
@@ -43,19 +44,16 @@ export default function Portfolio() {
             return;
         }
 
-        // 1. Fetch User Profile for Balance
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('balance')
-            .eq('id', session.user.id)
-            .single();
-
-        if (profile) setBalance(profile.balance);
-
-        // 2. Fetch User Positions
-        const { data: positionsData, error } = await supabase
-            .from('positions')
-            .select(`
+        // Parallel Fetch: Profile (Balance) & Positions
+        const [profileResult, positionsResult] = await Promise.all([
+            supabase
+                .from('profiles')
+                .select('balance')
+                .eq('id', session.user.id)
+                .single(),
+            supabase
+                .from('positions')
+                .select(`
                     *,
                     markets (
                         home_team,
@@ -64,7 +62,15 @@ export default function Portfolio() {
                         away_price
                     )
                 `)
-            .eq('user_id', session.user.id);
+                .eq('user_id', session.user.id)
+        ]);
+
+        const { data: profile, error: profileError } = profileResult;
+        if (profileError) console.error('Error fetching profile:', profileError);
+
+        if (profile) setBalance(profile.balance);
+
+        const { data: positionsData } = positionsResult;
 
         if (positionsData) {
             const formattedPositions = positionsData.map(pos => {
@@ -103,7 +109,16 @@ export default function Portfolio() {
         fetchPortfolio(); // Refresh balance
     };
 
-    if (loading) return <div className={styles.container}>Carregando carteira...</div>;
+    if (loading) return (
+        <div className={styles.container}>
+            <Skeleton width="200px" height="32px" style={{ marginBottom: '20px' }} />
+            <div className={styles.balanceCard}>
+                <Skeleton width="100px" height="20px" style={{ marginBottom: '10px' }} />
+                <Skeleton width="150px" height="40px" style={{ marginBottom: '10px' }} />
+                <Skeleton width="100%" height="200px" />
+            </div>
+        </div>
+    );
 
     const totalInvested = positions.reduce((acc, pos) => acc + (pos.shares * pos.avgPrice), 0);
 
@@ -151,8 +166,8 @@ export default function Portfolio() {
                                     <strong>{pos.avgPrice.toFixed(2)}</strong>
                                 </div>
                                 <div className={styles.stat}>
-                                    <span>Atual</span>
-                                    <strong>{pos.currentPrice.toFixed(2)}</strong>
+                                    <span>Valor Total</span>
+                                    <strong>R$ {(pos.shares * pos.currentPrice).toFixed(2)}</strong>
                                 </div>
                                 <div className={styles.stat}>
                                     <span>Retorno</span>

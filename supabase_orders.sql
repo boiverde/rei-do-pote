@@ -57,17 +57,18 @@ create or replace function public.purchase_shares(
   p_price decimal
 ) returns json
 language plpgsql
+security definer -- Run as creator (Bypass RLS)
+set search_path = public -- Secure search path
 as $$
 declare
   v_user_id uuid;
   current_balance decimal;
   total_cost decimal;
 begin
-  v_user_id := auth.uid();
+  v_user_id := auth.uid(); -- Still gets the calling user's ID
   total_cost := p_shares * p_price;
 
   -- 1. Check Balance
-  -- Ensure 'profiles' table exists and is lowercase in your database.
   select balance into current_balance from profiles where id = v_user_id;
   
   if current_balance is null then
@@ -92,6 +93,9 @@ begin
   do update set 
     avg_price = ((positions.avg_price * positions.shares) + (EXCLUDED.avg_price * EXCLUDED.shares)) / (positions.shares + EXCLUDED.shares),
     shares = positions.shares + EXCLUDED.shares;
+
+  -- 5. Update Market Volume
+  update markets set volume = volume + total_cost where id = p_market_id;
 
   return json_build_object('success', true, 'new_balance', current_balance - total_cost);
 end;

@@ -22,7 +22,7 @@ export default function Login() {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
-                <h1 className={styles.title}>Entrar no BolaObr</h1>
+                <h1 className={styles.title}>Entrar no Rei do Pote</h1>
                 <p className={styles.subtitle}>Faça login para começar a operar.</p>
 
                 <div className={styles.actions}>

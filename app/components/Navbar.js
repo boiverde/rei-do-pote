@@ -12,32 +12,26 @@ export default function Navbar() {
     useEffect(() => {
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
-
             if (session?.user) {
+                // Fetch Profile (Balance + Admin)
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('is_admin')
+                    .select('is_admin, balance')
                     .eq('id', session.user.id)
                     .single();
+
+                setUser({ ...session.user, balance: profile?.balance || 0 });
                 setIsAdmin(profile?.is_admin || false);
+            } else {
+                setUser(null);
             }
         };
 
         checkUser();
 
+        // Listen for Auth Changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('is_admin')
-                    .eq('id', session.user.id)
-                    .single();
-                setIsAdmin(profile?.is_admin || false);
-            } else {
-                setIsAdmin(false);
-            }
+            checkUser(); // Re-fetch on login/logout
         });
 
         return () => subscription.unsubscribe();
@@ -54,13 +48,13 @@ export default function Navbar() {
                 <div className={styles.logo}>
                     <Link href="/">
                         <Image
-                            src="/logo.png"
-                            alt="BolaObr Logo"
-                            width={220}
-                            height={60}
-                            className={styles.logoImage}
-                            priority
+                            src="/globe.svg" // Using existing asset for now, replaced mock link
+                            alt="Rei do Pote Logo"
+                            width={32}
+                            height={32}
+                            className={styles.logoIcon}
                         />
+                        <span className={styles.logoText}>Rei do Pote</span>
                     </Link>
                 </div>
 
@@ -79,7 +73,7 @@ export default function Navbar() {
                         <>
                             <div className={styles.balance}>
                                 <span className={styles.balanceLabel}>Saldo</span>
-                                <span className={styles.balanceValue}>R$ 1.000,00</span>
+                                <span className={styles.balanceValue}>R$ {user.balance?.toFixed(2).replace('.', ',') || '0,00'}</span>
                             </div>
                             <div className={styles.profile}>
                                 {user.user_metadata?.avatar_url && (
