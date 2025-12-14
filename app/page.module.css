@@ -107,12 +107,7 @@
 .grid {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  /* Divider feel */
-  background: var(--border);
-  /* Background for gaps */
-  border-radius: 8px;
-  overflow: hidden;
+  gap: 16px;
 }
 
 @media (max-width: 600px) {

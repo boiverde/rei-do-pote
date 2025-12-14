@@ -44,6 +44,13 @@ export default function BetSlip() {
         }
     }, [activeTab]);
 
+    // Auto-switch to Slip when a bet is added
+    useEffect(() => {
+        if (bets.length > 0) {
+            setActiveTab('slip');
+        }
+    }, [bets.length]);
+
     const handleAmountChange = (id, value) => {
         setAmounts(prev => ({ ...prev, [id]: value }));
     };
@@ -58,8 +65,33 @@ export default function BetSlip() {
     const getPotentialReturn = () => {
         return bets.reduce((sum, bet) => {
             const amount = parseFloat(amounts[bet.id] || 0);
-            if (isNaN(amount)) return sum;
-            return sum + (amount * bet.odds);
+            if (isNaN(amount) || amount <= 0) return sum;
+
+            // Parimutuel Simulation
+            // We simulate: What if this bet is added to the pool RIGHT NOW?
+            const currentHomePool = parseFloat(bet.homePool || 0);
+            const currentAwayPool = parseFloat(bet.awayPool || 0);
+
+            let winningSidePool, totalPool;
+
+            if (bet.option === 'home') {
+                winningSidePool = currentHomePool + amount;
+                totalPool = currentHomePool + currentAwayPool + amount;
+            } else {
+                winningSidePool = currentAwayPool + amount;
+                totalPool = currentHomePool + currentAwayPool + amount;
+            }
+
+            // Fee: 10%
+            const netPool = totalPool * 0.90;
+
+            // My Share = My Bet / Total Winning Side Pool
+            const myShare = amount / winningSidePool;
+
+            // Return = Net Pool * My Share
+            const estimatedReturn = netPool * myShare;
+
+            return sum + estimatedReturn;
         }, 0);
     };
 
@@ -156,7 +188,7 @@ export default function BetSlip() {
                                             >✕</button>
                                         </div>
                                         <div className={styles.betMatch}>{bet.matchStr}</div>
-                                        <div className={styles.betOdds}>Retorno Estimado: {bet.odds.toFixed(2)}x</div>
+                                        <div className={styles.betOdds}>Valor da Cota: R$ {bet.price.toFixed(2)}</div>
 
                                         <div className={styles.stakeInputContainer}>
                                             <span className={styles.currencyPrefix}>R$</span>
@@ -206,7 +238,11 @@ export default function BetSlip() {
                         myBets.map((pos) => (
                             <div key={pos.id} className={styles.myBetItem}>
                                 <div className={styles.myBetHeader}>
-                                    <span className={styles.selectionName}>{pos.outcome}</span>
+                                    <span className={styles.selectionName}>
+                                        {pos.outcome === 'home' ? pos.markets?.home_team :
+                                            pos.outcome === 'away' ? pos.markets?.away_team :
+                                                pos.outcome}
+                                    </span>
                                     <span className={styles.sharesBadge}>{pos.shares} cotas</span>
                                 </div>
                                 <div className={styles.betMatch}>

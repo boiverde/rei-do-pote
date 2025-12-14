@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import styles from './page.module.css';
+import { toast } from 'sonner';
 
 export default function AdminPage() {
     const router = useRouter();
@@ -88,9 +89,9 @@ export default function AdminPage() {
         setSubmitting(false);
 
         if (error) {
-            alert('Erro ao criar mercado: ' + error.message);
+            toast.error('Erro ao criar mercado: ' + error.message);
         } else {
-            alert('Mercado criado com sucesso! 🚀');
+            toast.success('Mercado criado com sucesso! 🚀');
             // Reset form
             setFormData({
                 homeTeam: '',
@@ -113,12 +114,34 @@ export default function AdminPage() {
             const data = await res.json();
 
             if (data.success) {
-                alert(`Sucesso! ${data.message}\nJogos:\n${data.games.join('\n')}`);
+                toast.success(`${data.message}`);
+                console.log('Jogos:', data.games);
             } else {
-                alert('Erro: ' + (data.error || data.message));
+                toast.error('Erro: ' + (data.error || data.message));
             }
         } catch (err) {
-            alert('Erro de conexão.');
+            toast.error('Erro de conexão.');
+        } finally {
+            setSyncing(false);
+        }
+    };
+
+    const handleAutoResolve = async () => {
+        if (!confirm('Isso vai verificar resultados oficiais e PAGAR os vencedores automaticamente. Tem certeza?')) return;
+        setSyncing(true);
+        try {
+            const res = await fetch('/api/resolve-markets', { method: 'POST' });
+            const data = await res.json();
+            if (data.logs && data.logs.length > 0) {
+                toast.success('Processamento concluído!');
+                console.log('Relatório:', data.logs);
+                // Maybe show logs in a modal or simpler way?
+                // For now, logging to console is cleaner than a huge alert.
+            } else {
+                toast.info(data.message);
+            }
+        } catch (e) {
+            toast.error('Erro crítico: ' + e.message);
         } finally {
             setSyncing(false);
         }
@@ -134,9 +157,27 @@ export default function AdminPage() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <h1 className={styles.title}>Painel Admin 👮‍♂️</h1>
-                <button onClick={handleSync} disabled={syncing} className={styles.syncBtn}>
-                    {syncing ? 'Sincronizando...' : '🔄 Sincronizar Jogos'}
-                </button>
+                <div>
+                    <button onClick={handleSync} disabled={syncing} className={styles.syncBtn}>
+                        {syncing ? '...' : '🔄 Buscar Jogos'}
+                    </button>
+                    <button
+                        onClick={handleAutoResolve}
+                        disabled={syncing}
+                        style={{
+                            marginLeft: '10px',
+                            backgroundColor: '#22c55e',
+                            color: '#000',
+                            border: 'none',
+                            padding: '10px 20px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        💰 Pagar Vencedores (Auto)
+                    </button>
+                </div>
             </div>
 
             <div className={styles.card}>

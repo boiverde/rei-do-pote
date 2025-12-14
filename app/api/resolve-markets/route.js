@@ -1,0 +1,117 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+// Init Supabase (Admin Context)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+export async function POST(request) {
+    console.log("Starting Auto-Resolution...");
+
+    try {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // 1. Get Open Markets that are "Past Due" (Event Date < Now)
+        // We look back 3 days to catch anything missed.
+        const now = new Date();
+        const pastLimit = new Date();
+        pastLimit.setDate(now.getDate() - 3);
+
+        const { data: openMarkets, error: dbError } = await supabase
+            .from('markets')
+            .select('*')
+            .eq('status', 'open')
+            .lt('event_date', now.toISOString())
+            .gt('event_date', pastLimit.toISOString())
+            .limit(50); // Optimization: Process in batches to avoid timeout
+
+        if (dbError) throw dbError;
+
+        if (!openMarkets || openMarkets.length === 0) {
+            return NextResponse.json({ success: true, message: 'Nenhum mercado pendente para resolver.' });
+        }
+
+        console.log(`Checking ${openMarkets.length} pending markets...`);
+
+        // 2. Fetch Results from Football API (Yesterday & Today)
+        // We fetch a range to be safe.
+        const formatDate = (d) => d.toISOString().split('T')[0];
+        const dateStr = formatDate(now); // Today for testing. In prod, maybe fetch yesterday too.
+
+        // Note: For real robustness, we might need multiple fetches if games span days. 
+        // For the MVP, we fetch TODAY's fixtures.
+        const apiRes = await fetch(`https://v3.football.api-sports.io/fixtures?date=${dateStr}&status=FT-AET-PEN`, {
+            headers: {
+                'x-rapidapi-host': 'v3.football.api-sports.io',
+                'x-apisports-key': process.env.API_FOOTBALL_KEY
+            }
+        });
+
+        const apiData = await apiRes.json();
+
+        if (!apiData.response) {
+            return NextResponse.json({ success: false, message: 'Falha ao buscar resultados na API externa.' });
+        }
+
+        const finishedGames = apiData.response; // Games that are Finished, AET or Penalties
+        const logs = [];
+        let resolvedCount = 0;
+
+        // 3. Match and Resolve
+        for (const market of openMarkets) {
+            // Fuzzy match logic or strict match if we stored external ID.
+            // Since we didn't store external ID in explicit column (oops), we try to match by Team Names.
+            // This is "Good Enough" for MVP.
+
+            const matchResult = finishedGames.find(g =>
+                (g.teams.home.name === market.home_team || g.teams.home.name.includes(market.home_team)) &&
+                (g.teams.away.name === market.away_team || g.teams.away.name.includes(market.away_team))
+            );
+
+            if (matchResult) {
+                // Determine Winner
+                let winner = null;
+                const goalsHome = matchResult.goals.home;
+                const goalsAway = matchResult.goals.away;
+
+                // Check Penalties first?
+                if (matchResult.score.penalty.home !== null) {
+                    if (matchResult.score.penalty.home > matchResult.score.penalty.away) winner = 'home';
+                    else winner = 'away';
+                } else {
+                    // Regular Time / AET
+                    if (goalsHome > goalsAway) winner = 'home';
+                    else if (goalsAway > goalsHome) winner = 'away';
+                    else winner = 'draw';
+                }
+
+                // EXECUTE RESOLUTION (Call RPC)
+                console.log(`Resolving ${market.id}: Winner ${winner}`);
+
+                const { data: rpcData, error: rpcError } = await supabase.rpc('resolve_market', {
+                    p_market_id: market.id,
+                    p_winning_outcome: winner
+                });
+
+                if (rpcError) {
+                    logs.push(`❌ Erro RPC ${market.id}: ${rpcError.message}`);
+                } else {
+                    logs.push(`✅ Resolvido: ${market.home_team} x ${market.away_team} -> Vencedor: ${winner.toUpperCase()}`);
+                    resolvedCount++;
+                }
+            } else {
+                logs.push(`⏳ Jogo não encontrado ou não finalizado na API: ${market.home_team} x ${market.away_team}`);
+            }
+        }
+
+        return NextResponse.json({
+            success: true,
+            resolved: resolvedCount,
+            logs: logs
+        });
+
+    } catch (error) {
+        console.error('Auto-Resolve Error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+}

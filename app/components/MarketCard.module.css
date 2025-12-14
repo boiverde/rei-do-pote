@@ -1,123 +1,142 @@
-.row {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
+.card {
     background: var(--surface);
-    gap: 16px;
-}
-
-.row:hover {
-    background: var(--surface-hover);
-}
-
-.meta {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: transform 0.2s, border-color 0.2s;
     display: flex;
     flex-direction: column;
+    gap: 16px;
+    position: relative;
+    /* Ensure stacking context */
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    min-width: 50px;
-    gap: 2px;
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
 .time {
-    font-size: 13px;
-    color: var(--foreground);
-    font-weight: 500;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .date {
-    font-size: 10px;
-    color: var(--text-muted);
+    opacity: 0.7;
 }
 
-.matchInfo {
-    flex: 1;
+.volume {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+}
+
+.teamsList {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 6px;
+    gap: 12px;
+}
+
+.teamRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 4px 0;
+}
+
+.teamInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
     text-decoration: none;
-    cursor: pointer;
+    color: inherit;
+    transition: opacity 0.2s;
+}
+
+.teamInfo:hover {
+    opacity: 0.8;
 }
 
 .team {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .logo {
     width: 24px;
     height: 24px;
     object-fit: contain;
+}
+
+.placeholderLogo {
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
 }
 
-.placeholderLogo {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    color: var(--text-muted);
-}
-
 .teamName {
+    font-weight: 600;
     font-size: 14px;
     color: var(--foreground);
-    font-weight: 400;
 }
 
-.row:hover .teamName {
-    color: var(--primary);
-    /* Highlight team on hover */
-}
-
-.oddsContainer {
+.priceBtn {
     display: flex;
-    gap: 8px;
-}
-
-.oddBtn {
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 44px;
-    background: #2a2a2a;
-    /* Slightly lighter than surface */
-    border: none;
-    border-radius: 4px;
+    background: var(--background);
+    border: 1px solid var(--card-border);
+    padding: 8px 16px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.1s;
+    transition: all 0.2s;
+    min-width: 90px;
+    height: 40px;
 }
 
-.oddBtn:hover {
-    background: var(--surface-hover);
-    border-color: var(--border-hover);
-}
-
-.oddBtn.selected {
-    background: rgba(0, 166, 81, 0.15);
-    /* Primary with opacity */
+.priceBtn:hover {
     border-color: var(--primary);
-    color: var(--primary);
+    background: rgba(0, 166, 81, 0.05);
 }
 
-.oddBtn.selected .oddValue {
-    color: var(--primary);
+.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white !important;
 }
 
-.oddLabel {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 600;
+.selected .value {
+    color: white !important;
 }
 
-.oddValue {
+.value {
     font-size: 14px;
     font-weight: 700;
     color: var(--primary);
+}
+
+.poolInfo {
+    margin-top: 4px;
+    font-size: 10px;
+    color: var(--primary);
+    text-align: center;
+    background: rgba(0, 166, 81, 0.1);
+    padding: 6px;
+    border-radius: 6px;
+    font-weight: 600;
 }
