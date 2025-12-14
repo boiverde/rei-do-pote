@@ -46,14 +46,8 @@ export default function Navbar() {
         <nav className={styles.navbar}>
             <div className={`container ${styles.container}`}>
                 <div className={styles.logo}>
-                    <Link href="/">
-                        <Image
-                            src="/globe.svg" // Using existing asset for now, replaced mock link
-                            alt="Rei do Pote Logo"
-                            width={32}
-                            height={32}
-                            className={styles.logoIcon}
-                        />
+                    <Link href="/" className={styles.logoLink}>
+                        <img src="/logo.png" alt="Rei do Pote" className={styles.logoImage} />
                         <span className={styles.logoText}>Rei do Pote</span>
                     </Link>
                 </div>

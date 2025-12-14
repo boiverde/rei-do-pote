@@ -5,8 +5,16 @@ import styles from './Sidebar.module.css';
 
 const FILTER_GROUPS = {
     "Nacional": ["Brasileirão Série A", "Copa do Brasil"],
-    "Internacional": ["Premier League", "La Liga"],
-    "Regionais": ["Paulistão", "Carioca"]
+    "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes", "Premier League", "La Liga"],
+    "Regionais": [
+        "Paulistão", "Carioca", "Mineiro", "Gaúcho", "Baiano",
+        "Pernambucano", "Cearense", "Copa do Nordeste", "Copa Verde",
+        "Paranaense", "Catarinense", "Goiano", "Alagoano", "Amapaense",
+        "Amazonense", "Brasiliense", "Capixaba", "Maranhense",
+        "Mato-Grossense", "Paraense", "Paraibano", "Piauiense",
+        "Potiguar", "Rondoniense", "Roraimense", "Sergipano",
+        "Sul-Mato-Grossense", "Tocantinense"
+    ]
 };
 
 export default function Sidebar() {

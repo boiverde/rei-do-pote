@@ -2,6 +2,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import BetSlip from "./components/BetSlip";
+import { Providers } from "./providers";
 import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,10 +19,13 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <Navbar />
         <div className="app-layout">
-          <Sidebar />
-          <main className="main-content">
-            {children}
-          </main>
+          <Providers>
+            <Sidebar />
+            <main className="main-content">
+              {children}
+            </main>
+            <BetSlip />
+          </Providers>
         </div>
         <Toaster richColors position="top-right" />
       </body>

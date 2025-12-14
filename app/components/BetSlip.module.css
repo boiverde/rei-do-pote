@@ -1,0 +1,286 @@
+.betslip {
+    width: var(--betslip-width);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    height: calc(100vh - 80px);
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.activeTab {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: rgba(0, 166, 81, 0.05);
+}
+
+.tabBadge {
+    background: var(--surface-hover);
+    color: var(--foreground);
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    margin-left: 4px;
+}
+
+.activeTab .tabBadge {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* My Bets Items */
+.myBetItem {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--primary);
+}
+
+.myBetHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.sharesBadge {
+    background: var(--surface-hover);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.betMeta {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    border-top: 1px dashed var(--border);
+    padding-top: 6px;
+}
+
+.feeDisclaimer {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 8px;
+    font-style: italic;
+}
+
+.header {
+    padding: 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge {
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.betItem {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
+}
+
+.betHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.selectionName {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+}
+
+.removeBtn:hover {
+    color: #ff4d4d;
+}
+
+.betMatch {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.betOdds {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--foreground);
+}
+
+.stakeInputContainer {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    /* Darker inner input */
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0 8px;
+}
+
+.currencyPrefix {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-right: 4px;
+}
+
+.stakeInput {
+    background: transparent;
+    border: none;
+    color: var(--foreground);
+    width: 100%;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.stakeInput::-webkit-outer-spin-button,
+.stakeInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+.stakeInput[type=number] {
+    -moz-appearance: textfield;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+    opacity: 0.6;
+}
+
+.emptyIcon {
+    font-size: 40px;
+    margin-bottom: 16px;
+    filter: grayscale(1);
+}
+
+.emptyText {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.emptySubtext {
+    font-size: 12px;
+}
+
+.footer {
+    padding: 16px;
+    background: var(--surface);
+    /* Could be slightly different */
+    border-top: 1px solid var(--border);
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.potentialWin {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.submitBtn {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 13px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover {
+    background: var(--primary-hover);
+}
+
+.submitBtn:disabled {
+    background: var(--surface-hover);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}

@@ -19,16 +19,21 @@
 }
 
 .logo {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
     display: flex;
     align-items: center;
 }
 
+.logoLink {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .logoImage {
+    height: 40px;
+    width: auto;
     object-fit: contain;
-    vertical-align: middle;
 }
 
 .profile {

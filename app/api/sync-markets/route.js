@@ -61,7 +61,22 @@ export async function POST(request) {
 
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // 2. Transform Data
+        // 2a. Fetch existing markets to preserve 'volume' and 'history'
+        // We only need ID and Volume for the ones we are about to update.
+        const { data: existingMarkets } = await supabase
+            .from('markets')
+            .select('id, volume, history');
+
+        const volumeMap = {};
+        const historyMap = {};
+        if (existingMarkets) {
+            existingMarkets.forEach(m => {
+                volumeMap[m.id] = m.volume;
+                historyMap[m.id] = m.history;
+            });
+        }
+
+        // 2b. Transform Data
         const marketsToCreate = allMatches.map(match => {
             const homeTeam = match.teams.home.name;
             const awayTeam = match.teams.away.name;
@@ -87,32 +102,36 @@ export async function POST(request) {
 
             const { homePrice, awayPrice } = calculateOdds(homeTeam, awayTeam);
 
+            // Preserve existing volume/history if exists, else default
+            const existingVolume = volumeMap[uniqueId] || 0;
+            const existingHistory = historyMap[uniqueId] || '[]'; // jsonb default
+
             return {
                 id: uniqueId,
                 home_team: homeTeam,
                 away_team: awayTeam,
                 home_logo: match.teams.home.logo,
                 away_logo: match.teams.away.logo,
-                // description: REMOVED (not in DB)
                 league: leagueName,
                 event_date: match.fixture.date,
                 status: 'open',
                 home_price: homePrice,
                 away_price: awayPrice,
-                volume: 0
+                volume: existingVolume,
+                history: existingHistory // explicit preserve
             };
         });
 
-        // 3. Insert into Supabase (Upsert with ignoreDuplicates to skip existing and preserve volume)
+        // 3. Insert into Supabase (Upsert with update to apply new logos)
         const { error } = await supabase
             .from('markets')
-            .upsert(marketsToCreate, { onConflict: 'id', ignoreDuplicates: true });
+            .upsert(marketsToCreate, { onConflict: 'id', ignoreDuplicates: false }); // Changed to FALSE to allow updates
 
         if (error) throw error;
 
         return NextResponse.json({
             success: true,
-            message: `${marketsToCreate.length} jogos sincronizados!`,
+            message: `${marketsToCreate.length} jogos sincronizados e atualizados!`,
             games: marketsToCreate.map(m => `${m.home_team} x ${m.away_team} (${m.league})`)
         });
 
