@@ -31,43 +31,10 @@ export default async function Home({ searchParams }) {
 
   return (
     <main className={styles.main}>
-      <div className={styles.hero}>
-        <h1 className={styles.title}>Futebol Brasileiro</h1>
-        <p className={styles.subtitle}>Negocie o resultado dos principais jogos da rodada.</p>
-
-        {/* Filter Navigation - Using Links for Server Component interactivity */}
-        <div className={styles.filterBar}>
-          {Object.keys(FILTER_GROUPS).map(group => (
-            <Link
-              key={group}
-              href={`/?group=${group}`}
-              className={`${styles.filterBtn} ${initialGroup === group ? styles.activeFilter : ''}`}
-            >
-              {group}
-            </Link>
-          ))}
-        </div>
-
-        {/* Sub-Filters */}
-        {initialGroup !== "Todos" && (
-          <div className={styles.subFilterBar}>
-            <Link
-              href={`/?group=${initialGroup}`}
-              className={`${styles.subFilterBtn} ${initialLeague === null ? styles.activeSubFilter : ''}`}
-            >
-              Tudo de {initialGroup}
-            </Link>
-            {FILTER_GROUPS[initialGroup].map(league => (
-              <Link
-                key={league}
-                href={`/?group=${initialGroup}&league=${league}`}
-                className={`${styles.subFilterBtn} ${initialLeague === league ? styles.activeSubFilter : ''}`}
-              >
-                {league}
-              </Link>
-            ))}
-          </div>
-        )}
+      <div className={styles.header}>
+        <h1 className={styles.title}>
+          {initialLeague || initialGroup} <span className={styles.liveBadge} >Ao Vivo</span>
+        </h1>
       </div>
 
       <div className={styles.grid}>

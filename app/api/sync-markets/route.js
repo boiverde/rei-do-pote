@@ -91,6 +91,8 @@ export async function POST(request) {
                 id: uniqueId,
                 home_team: homeTeam,
                 away_team: awayTeam,
+                home_logo: match.teams.home.logo,
+                away_logo: match.teams.away.logo,
                 // description: REMOVED (not in DB)
                 league: leagueName,
                 event_date: match.fixture.date,

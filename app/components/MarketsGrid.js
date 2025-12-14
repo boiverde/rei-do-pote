@@ -27,6 +27,8 @@ async function getMarkets() {
         id: m.id,
         homeTeam: m.home_team,
         awayTeam: m.away_team,
+        homeLogo: m.home_logo,
+        awayLogo: m.away_logo,
         league: m.league,
         eventDate: m.event_date,
         homePrice: m.home_price,

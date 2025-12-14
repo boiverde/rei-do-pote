@@ -1,97 +1,103 @@
-.card {
-    display: block;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 20px;
-    transition: transform 0.2s, border-color 0.2s;
-    text-decoration: none;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.date,
-.volume {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.teamsContainer {
+.row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    background: var(--surface);
+    gap: 16px;
 }
 
-.teamInfo {
-    flex: 1;
-    display: flex;
-    justify-content: center;
+.row:hover {
+    background: var(--surface-hover);
 }
 
-.teamName {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--foreground);
-    text-align: center;
-}
-
-.vs {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin: 0 12px;
-}
-
-.outcomes {
-    display: flex;
-    gap: 12px;
-}
-
-.outcome {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 12px;
-    border-radius: 8px;
+.meta {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    border: 1px solid transparent;
-    transition: background 0.2s;
+    min-width: 50px;
+    gap: 2px;
 }
 
-.outcome:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
+.time {
+    font-size: 13px;
+    color: var(--foreground);
+    font-weight: 500;
 }
 
-.outcomeLabel {
-    font-size: 11px;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+.date {
+    font-size: 10px;
+    color: var(--text-muted);
 }
 
-.price {
-    font-size: 18px;
+.matchInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.teamName {
+    font-size: 14px;
+    color: var(--foreground);
+    font-weight: 400;
+}
+
+.row:hover .teamName {
+    color: var(--primary);
+    /* Highlight team on hover */
+}
+
+.oddsContainer {
+    display: flex;
+    gap: 8px;
+}
+
+.oddBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 44px;
+    background: #2a2a2a;
+    /* Slightly lighter than surface */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.oddBtn:hover {
+    background: #3a3a3a;
+    transform: translateY(-1px);
+}
+
+.oddLabel {
+    font-size: 9px;
+    color: var(--text-muted);
     font-weight: 700;
 }
 
-.green {
+.oddValue {
+    font-size: 14px;
     color: var(--primary);
+    /* Neon Green for Odds */
+    font-weight: 700;
 }

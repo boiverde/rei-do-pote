@@ -2,39 +2,48 @@ import Link from 'next/link';
 import styles from './MarketCard.module.css';
 
 export default function MarketCard({ match }) {
-    const formatPrice = (price) => `R$ ${price.toFixed(2).replace('.', ',')}`;
+    const formatPrice = (price) => match.status === 'suspended' ? '🔒' : price.toFixed(2);
 
     return (
-        <Link href={`/market/${match.id}`} className={styles.card}>
-            <div className={styles.header}>
-                <span className={styles.date}>{new Date(match.eventDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
-                <span className={styles.volume}>{match.volume} Vol.</span>
+        <div className={styles.row}>
+            {/* Meta Info (Time & Status) */}
+            <div className={styles.meta}>
+                <span className={styles.time}>
+                    {new Date(match.eventDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+                <span className={styles.date}>
+                    {new Date(match.eventDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                </span>
             </div>
 
-            <div className={styles.teamsContainer}>
-                <div className={styles.teamInfo}>
+            {/* Match Info (Teams) */}
+            <Link href={`/market/${match.id}`} className={styles.matchInfo}>
+                <div className={styles.team}>
+                    {match.homeLogo && <img src={match.homeLogo} alt="" className={styles.logo} />}
                     <span className={styles.teamName}>{match.homeTeam}</span>
                 </div>
-                <div className={styles.vs}>x</div>
-                <div className={styles.teamInfo}>
+                <div className={styles.team}>
+                    {match.awayLogo && <img src={match.awayLogo} alt="" className={styles.logo} />}
                     <span className={styles.teamName}>{match.awayTeam}</span>
                 </div>
-            </div>
+            </Link>
 
-            <div className={styles.outcomes}>
-                <div className={styles.outcome}>
-                    <div className={styles.outcomeLabel}>{match.homeTeam}</div>
-                    <div className={`${styles.price} ${styles.green}`}>
-                        {formatPrice(match.homePrice)}
-                    </div>
-                </div>
-                <div className={styles.outcome}>
-                    <div className={styles.outcomeLabel}>{match.awayTeam}</div>
-                    <div className={`${styles.price} ${styles.green}`}>
-                        {formatPrice(match.awayPrice)}
-                    </div>
-                </div>
+            {/* Odds / Actions */}
+            <div className={styles.oddsContainer}>
+                {/* Home Odds */}
+                <button className={styles.oddBtn}>
+                    <span className={styles.oddLabel}>1</span>
+                    <span className={styles.oddValue}>{formatPrice(match.homePrice)}</span>
+                </button>
+
+                {/* Draw (Placeholder if we had it) - skipping for now as per data model */}
+
+                {/* Away Odds */}
+                <button className={styles.oddBtn}>
+                    <span className={styles.oddLabel}>2</span>
+                    <span className={styles.oddValue}>{formatPrice(match.awayPrice)}</span>
+                </button>
             </div>
-        </Link>
+        </div>
     );
 }

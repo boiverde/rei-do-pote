@@ -63,7 +63,7 @@ export default async function MarketPage({ params }) {
             <div className={styles.header}>
                 <Link href="/" className={styles.backLink}>← Voltar para Mercados</Link>
                 <h1 className={styles.title}>{match.homeTeam} vs {match.awayTeam}</h1>
-                <div className={styles.date}>{new Date(match.eventDate).toLocaleDateString('pt-BR')} • {new Date(match.eventDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+                <div className={styles.date}>{new Date(match.eventDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} • {new Date(match.eventDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
 
             <div className={styles.content}>

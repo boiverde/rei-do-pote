@@ -1,21 +1,33 @@
 :root {
-  --background: #0d0d12;
+  /* Core Colors */
+  --background: #121212;
+  /* Deepest Dark */
+  --surface: #1e1e1e;
+  /* Card/Element BG */
+  --surface-hover: #2d2d2d;
   --foreground: #ffffff;
 
-  --card-bg: #1a1a20;
-  --card-border: #292932;
+  --border: #2e2e2e;
 
-  --primary: #00e676;
-  /* Green for Winner */
-  --primary-hover: #00b35c;
+  /* Brand Colors */
+  --primary: #00a651;
+  /* Bet365 Green */
+  --primary-hover: #008f45;
+  --primary-foreground: #ffffff;
 
-  --danger: #ff5252;
-  /* Red for Loser */
-  --danger-hover: #e04040;
+  --accent: #333333;
+  /* Sidebar/Secondary elements */
 
-  --text-secondary: #a0a0b0;
-  --text-muted: #666675;
+  /* Semantic */
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
 
+  --danger: #ef4444;
+  --success: #22c55e;
+
+  /* Layout */
+  --sidebar-width: 240px;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -27,32 +39,26 @@
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  /* Deep, rich dark background */
-  background-color: #050505;
-
-  /* Large bottom glow (Abstract Ball Shadow) */
-  background-image:
-    /* Subtle Grid Overlay */
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    /* The "Ball" Shadow/Glow - Stronger Green at bottom */
-    radial-gradient(circle at 50% 100%, rgba(0, 230, 118, 0.15) 0%, rgba(5, 5, 5, 0) 50%);
-
-  background-size:
-    40px 40px,
-    /* Grid size */
-    40px 40px,
-    /* Grid size */
-    100% 100%;
-  /* Gradient size */
-
-  background-attachment: fixed;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  overflow-x: hidden;
+
+  /* Modern Background: Grid + Subtle Green Deep Glow */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 50% 0%, rgba(0, 166, 81, 0.08) 0%, transparent 50%);
+  /* Top Glow */
+
+  background-size:
+    40px 40px,
+    40px 40px,
+    100% 100%;
+
+  background-attachment: fixed;
 }
 
 a {
@@ -125,6 +131,16 @@ a {
   color: var(--danger);
 }
 
-.text-secondary {
-  color: var(--text-secondary);
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - 80px);
+  /* Fill remaining height */
+  max-width: 1400px;
+  /* Wider container for dashboard feel */
+  margin: 0 auto;
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px;
 }
