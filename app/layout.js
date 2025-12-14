@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import BetSlip from "./components/BetSlip";
 import { Providers } from "./providers";
 import { Toaster } from 'sonner';
+import { Suspense } from 'react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
         <Navbar />
         <div className="app-layout">
           <Providers>
-            <Sidebar />
+            <Suspense fallback={<div style={{ width: '250px', background: 'var(--card-bg)' }} />}>
+              <Sidebar />
+            </Suspense>
             <main className="main-content">
               {children}
             </main>
