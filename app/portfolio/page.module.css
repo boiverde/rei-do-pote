@@ -132,3 +132,49 @@
 .red {
     color: var(--danger);
 }
+
+.transactionList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transactionItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.txInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.txType {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.txDate {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.txAmount {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px dashed var(--card-border);
+}

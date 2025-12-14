@@ -12,6 +12,7 @@ const PortfolioChart = dynamic(() => import('../components/PortfolioChart'), { s
 
 export default function Portfolio() {
     const [positions, setPositions] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [balance, setBalance] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -44,8 +45,8 @@ export default function Portfolio() {
             return;
         }
 
-        // Parallel Fetch: Profile (Balance) & Positions
-        const [profileResult, positionsResult] = await Promise.all([
+        // Parallel Fetch: Profile (Balance) & Positions & Transactions
+        const [profileResult, positionsResult, transactionsResult] = await Promise.all([
             supabase
                 .from('profiles')
                 .select('balance')
@@ -62,7 +63,14 @@ export default function Portfolio() {
                         away_price
                     )
                 `)
+
+                .eq('user_id', session.user.id),
+            supabase
+                .from('transactions')
+                .select('*')
                 .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false })
+                .limit(20)
         ]);
 
         const { data: profile, error: profileError } = profileResult;
@@ -97,6 +105,11 @@ export default function Portfolio() {
                 };
             });
             setPositions(formattedPositions);
+        }
+
+        const { data: transactionsData } = transactionsResult; // 3rd result from Promise.all
+        if (transactionsData) {
+            setTransactions(transactionsData);
         }
         setLoading(false);
     };
@@ -180,6 +193,25 @@ export default function Portfolio() {
                     ))
                 ) : (
                     <div className={styles.emptyState}>Você ainda não fez nenhum investimento.</div>
+                )}
+            </div>
+
+            <div className={styles.sectionTitle}>Histórico de Transações</div>
+            <div className={styles.transactionList}>
+                {transactions.length > 0 ? (
+                    transactions.map((tx) => (
+                        <div key={tx.id} className={styles.transactionItem}>
+                            <div className={styles.txInfo}>
+                                <span className={styles.txType}>{tx.type === 'deposit' ? 'Depósito' : 'Saque'}</span>
+                                <span className={styles.txDate}>{new Date(tx.created_at).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                            <div className={`${styles.txAmount} ${tx.type === 'deposit' ? styles.green : styles.red}`}>
+                                {tx.type === 'deposit' ? '+' : '-'} R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className={styles.emptyState}>Nenhuma transação recente.</div>
                 )}
             </div>
 
