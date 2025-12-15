@@ -73,6 +73,31 @@ export default function Navbar() {
         window.location.reload();
     };
 
+    // Level Calculation Helper
+    const getLevelInfo = (xp) => {
+        let level = 1;
+        let xpForNext = 100;
+        let currentLevelXp = 0; // Cumulative XP needed to reach current level
+
+        // Example:
+        // Lvl 1: 0 XP (Next: 100)
+        // Lvl 2: 100 XP (Next: 300) -> Diff 200
+        // Lvl 3: 300 XP (Next: 600) -> Diff 300
+        while (xp >= xpForNext) {
+            currentLevelXp = xpForNext;
+            level++;
+            xpForNext = currentLevelXp + (level * 100);
+        }
+
+        const xpInLevel = xp - currentLevelXp;
+        const xpNeededForLevel = level * 100;
+        const progress = Math.min((xpInLevel / xpNeededForLevel) * 100, 100);
+
+        return { level, progress, xpNeededForLevel, xpInLevel };
+    };
+
+    const { level, progress, xpNeededForLevel, xpInLevel } = getLevelInfo(user?.xp || 0);
+
     return (
         <nav className={styles.navbar}>
             <div className={`container ${styles.container}`}>
@@ -96,15 +121,18 @@ export default function Navbar() {
                 <div className={styles.actions}>
                     {user ? (
                         <>
-                            <div className={styles.balance}>
-                                {/* XP Badge */}
-                                <div className={styles.xpBadge} title="Pontos de Experiência (Fantasy)">
-                                    <span className={styles.xpIcon}>⭐</span>
-                                    <span className={styles.xpValue}>{user.xp || 0} XP</span>
+                            {/* Level & XP Section */}
+                            <div className={styles.levelContainer} title={`Nível ${level} (${xpInLevel}/${xpNeededForLevel} XP para o próximo)`}>
+                                <div className={styles.levelBadge}>
+                                    <span className={styles.levelLabel}>LVL</span>
+                                    <span className={styles.levelNumber}>{level}</span>
                                 </div>
+                                <div className={styles.xpBarContainer}>
+                                    <div className={styles.xpBarFill} style={{ width: `${progress}%` }}></div>
+                                </div>
+                            </div>
 
-                                <div className={styles.divider}></div>
-
+                            <div className={styles.balance}>
                                 <span className={styles.balanceLabel}>Saldo</span>
                                 <span className={styles.balanceValue}>R$ {user.balance?.toFixed(2).replace('.', ',') || '0,00'}</span>
                                 <Link href="/deposit" className={styles.depositLink} title="Depositar">
