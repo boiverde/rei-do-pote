@@ -100,28 +100,31 @@ export default function DepositPage() {
                 </>
             ) : (
                 <div className={styles.qrContainer}>
-                    <p style={{ color: '#333', fontWeight: 'bold', marginBottom: '0.5rem' }}>Escaneie o QR Code</p>
-                    <img
-                        src={`data:image/png;base64,${paymentData.qr_code_base64}`}
-                        alt="PIX QR Code"
-                        className={styles.qrImage}
-                    />
+                    <p className={styles.qrInstruction}>Escaneie o QR Code no app do seu banco</p>
 
-                    <div style={{ width: '100%', height: '1px', background: '#eee', margin: '1rem 0' }}></div>
+                    <div className={styles.qrWrapper}>
+                        <img
+                            src={`data:image/png;base64,${paymentData.qr_code_base64}`}
+                            alt="PIX QR Code"
+                            className={styles.qrImage}
+                        />
+                    </div>
+
+                    <div className={styles.separator}></div>
 
                     <button className={styles.copyButton} onClick={copyPix}>
                         <span>📋</span> Copiar Código PIX
                     </button>
 
-                    <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '1rem', textAlign: 'center' }}>
+                    <p className={styles.footerNote}>
                         Após o pagamento, seu saldo será atualizado automaticamente em instantes.
                     </p>
 
                     <button
-                        style={{ marginTop: '1rem', background: 'transparent', border: 'none', color: '#00ccff', cursor: 'pointer', textDecoration: 'underline' }}
+                        className={styles.backButton}
                         onClick={() => setPaymentData(null)}
                     >
-                        Voltar / Novo Depósito
+                        ← Voltar / Novo Depósito
                     </button>
                 </div>
             )}
