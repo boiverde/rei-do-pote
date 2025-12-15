@@ -46,12 +46,12 @@ export default function DepositPage() {
 
             const data = await response.json();
 
-            if (data.error) throw new Error(data.error);
+            if (data.error) throw new Error(data.details || data.error);
 
             setPaymentData(data);
         } catch (error) {
             console.error(error);
-            toast.error("Erro ao criar pagamento. Tente novamente.");
+            toast.error(error.message || "Erro ao criar pagamento. Tente novamente.");
         } finally {
             setLoading(false);
         }

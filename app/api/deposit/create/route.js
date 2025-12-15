@@ -8,33 +8,51 @@ const payment = new Payment(mpClient);
 export async function POST(request) {
     try {
         const supabase = await createClient();
-        const { amount, user_id, email, description } = await request.json();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-        if (!amount || !user_id || !email) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        if (authError || !user) {
+            console.error('Auth Error:', authError);
+            return NextResponse.json({ error: 'Unauthorized', details: 'Você precisa estar logado para depositar.' }, { status: 401 });
         }
 
-        const uniqueRef = `DEPOSIT-${user_id}-${Date.now()}`;
+        const { amount, description } = await request.json();
+
+        if (!amount) {
+            return NextResponse.json({ error: 'Missing amount' }, { status: 400 });
+        }
+
+        const uniqueRef = `DEPOSIT-${user.id}-${Date.now()}`;
 
         const paymentData = {
             transaction_amount: Number(amount),
             description: description || 'Depósito BolaObr',
             payment_method_id: 'pix',
             payer: {
-                email: email,
+                email: user.email,
+                first_name: user.user_metadata?.full_name?.split(' ')[0] || 'User',
             },
             external_reference: uniqueRef,
-            notification_url: `${request.headers.get('origin')}/api/deposit/webhook` // Or your public URL
+            notification_url: `${request.headers.get('origin')}/api/deposit/webhook`
         };
 
-        const response = await payment.create({ body: paymentData });
+        let response;
+        try {
+            response = await payment.create({ body: paymentData });
+        } catch (mpError) {
+            console.error('Mercado Pago Error:', mpError);
+            return NextResponse.json({
+                error: 'Payment Gateway Error',
+                details: mpError.message || 'Erro no processamento do pagamento.'
+            }, { status: 502 });
+        }
+
         const { id, point_of_interaction } = response;
 
         // Save initial transaction state to Supabase
         const { error: dbError } = await supabase
             .from('transactions')
             .insert({
-                user_id: user_id,
+                user_id: user.id,
                 amount: amount,
                 type: 'deposit',
                 status: 'pending',
@@ -46,8 +64,9 @@ export async function POST(request) {
 
         if (dbError) {
             console.error('Supabase Error:', dbError);
-            // We might want to cancel the payment here if DB fails, but for now just returning error
-            return NextResponse.json({ error: 'Failed to record transaction' }, { status: 500 });
+            // We do NOT return 500 here because the payment was already created at MP.
+            // We just log it. The webhook will eventually reconcile or the user can contact support.
+            // But for the user experience, we return the QR code.
         }
 
         return NextResponse.json({
@@ -58,7 +77,7 @@ export async function POST(request) {
         });
 
     } catch (error) {
-        console.error('Mercado Pago Error:', error);
-        return NextResponse.json({ error: 'Payment creation failed', details: error.message }, { status: 500 });
+        console.error('Unexpected Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
     }
 }
