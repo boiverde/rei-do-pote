@@ -48,8 +48,15 @@ export default function UsersAdmin() {
                     'Authorization': `Bearer ${token}`
                 }
             });
+
             if (res.status === 403) throw new Error('Acesso negado (403)');
-            if (!res.ok) throw new Error('Falha ao buscar usuários');
+
+            if (!res.ok) {
+                // Try to parse server error
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `Erro Servidor (${res.status})`);
+            }
+
             const data = await res.json();
             setUsers(data || []);
         } catch (error) {
