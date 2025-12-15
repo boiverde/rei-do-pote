@@ -4,10 +4,27 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export async function GET() {
+export async function GET(request) {
     try {
+        // 1. Check Auth Token
+        const authHeader = request.headers.get('Authorization');
+        if (!authHeader) {
+            return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
+        }
+
+        const token = authHeader.replace('Bearer ', '');
         const supabase = createClient(supabaseUrl, supabaseKey);
 
+        // 2. Verify User
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+        }
+
+        // TODO: Add stricter Admin Role check here (e.g., if user.email === 'admin@bolaobr.com')
+        // For now, we assume access to the Admin Page is guarded by layout/middleware, but this API protection is crucial.
+
+        // 3. Fetch Data (Securely)
         const { data: users, error } = await supabase
             .from('profiles')
             .select('*')

@@ -16,7 +16,16 @@ export default function UsersAdmin() {
     async function fetchUsers() {
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/users');
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
+            if (!token) throw new Error('Não autenticado');
+
+            const res = await fetch('/api/admin/users', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (!res.ok) throw new Error('Falha ao buscar usuários');
             const data = await res.json();
             setUsers(data || []);
