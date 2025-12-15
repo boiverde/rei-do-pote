@@ -5,7 +5,7 @@ import styles from './Sidebar.module.css';
 
 const FILTER_GROUPS = {
     "Nacional": ["Brasileirão Série A", "Copa do Brasil", "Clássicos Estaduais"],
-    "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes", "Premier League", "La Liga"]
+    "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes", "Premier League", "La Liga", "Champions League"]
 };
 
 export default function Sidebar() {

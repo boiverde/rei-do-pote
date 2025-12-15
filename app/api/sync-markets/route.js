@@ -101,12 +101,15 @@ export async function POST(request) {
                 return BIG_TEAMS.includes(match.teams.home.name) || BIG_TEAMS.includes(match.teams.away.name);
             }
 
-            // 3. Europe (Premier, La Liga, Champions) - Keep IF Classic (BOTH must be Giants)
-            if (LEAGUES_EURO.includes(leagueId)) {
+            // 3. Europe (Premier, La Liga) - Keep IF Classic (BOTH must be Giants)
+            if ([39, 140].includes(leagueId)) {
                 const homeGiant = EURO_GIANTS.includes(match.teams.home.name);
                 const awayGiant = EURO_GIANTS.includes(match.teams.away.name);
                 return homeGiant && awayGiant;
             }
+
+            // 4. Champions League (ID 2) - KEEP ALL (It's elite by definition)
+            if (leagueId === 2) return true;
 
             // 4. Regionals/State (Others) - Keep if BR Big Team involved
             // If it's not in the lists above but was fetched (via date search), it's likely a state league.
