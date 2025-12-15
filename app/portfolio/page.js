@@ -140,9 +140,14 @@ export default function Portfolio() {
             <div className={styles.balanceCard}>
                 <div className={styles.balanceHeader}>
                     <span>Saldo Disponível</span>
-                    <Link href="/deposit" className={styles.depositBtn}>
-                        + Depositar
-                    </Link>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <Link href="/withdraw" className={styles.withdrawBtn}>
+                            - Sacar
+                        </Link>
+                        <Link href="/deposit" className={styles.depositBtn}>
+                            + Depositar
+                        </Link>
+                    </div>
                 </div>
                 <div className={styles.balanceAmount}>R$ {balance.toFixed(2).replace('.', ',')}</div>
                 <div className={styles.balanceMeta}>Investido: R$ {totalInvested.toFixed(2).replace('.', ',')}</div>
