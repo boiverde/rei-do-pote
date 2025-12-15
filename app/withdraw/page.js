@@ -1,7 +1,7 @@
 
 "use client";
 import { useState, useEffect } from 'react';
-import { createBrowserClient } from '@/app/lib/supabase';
+import { supabase } from '@/app/lib/supabase';
 import styles from './page.module.css';
 
 export default function WithdrawPage() {
@@ -14,7 +14,7 @@ export default function WithdrawPage() {
     const [balance, setBalance] = useState(0);
     const [user, setUser] = useState(null);
 
-    const supabase = createBrowserClient();
+
 
     useEffect(() => {
         fetchUser();
