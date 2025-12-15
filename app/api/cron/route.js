@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
-    // Basic security: In production, verify auth header from Vercel
-    // const authHeader = request.headers.get('authorization');
-    // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) { ... }
+    // Security: Verify auth header from Vercel
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     console.log('[CRON] Starting daily jobs...');
 

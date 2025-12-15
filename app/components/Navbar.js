@@ -30,11 +30,41 @@ export default function Navbar() {
         checkUser();
 
         // Listen for Auth Changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            checkUser(); // Re-fetch on login/logout
+        const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            checkUser();
         });
 
-        return () => subscription.unsubscribe();
+        // Listen for Realtime Balance Changes
+        let profileSub = null;
+        if (typeof window !== 'undefined') { // Safety check
+            profileSub = supabase
+                .channel('balance-changes')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'profiles',
+                        // We can't filter by user.id easily in the channel definition if user isn't set yet,
+                        // so we might need to filter inside the callback OR re-subscribe when user changes.
+                        // Simpler approach: Subscribe globally but filter in callback.
+                    },
+                    (payload) => {
+                        setUser(prev => {
+                            if (prev && payload.new.id === prev.id) {
+                                return { ...prev, balance: payload.new.balance };
+                            }
+                            return prev;
+                        });
+                    }
+                )
+                .subscribe();
+        }
+
+        return () => {
+            authSub.unsubscribe();
+            if (profileSub) supabase.removeChannel(profileSub);
+        };
     }, []);
 
     const handleLogout = async () => {
