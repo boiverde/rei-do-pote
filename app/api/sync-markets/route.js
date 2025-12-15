@@ -115,6 +115,23 @@ export async function POST(request) {
             return homeBig || awayBig;
         });
 
+        // Initialize Supabase Client (Restored)
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Fetch existing markets to preserve 'volume' and 'history'
+        const { data: existingMarkets } = await supabase
+            .from('markets')
+            .select('id, volume, history');
+
+        const volumeMap = {};
+        const historyMap = {};
+        if (existingMarkets) {
+            existingMarkets.forEach(m => {
+                volumeMap[m.id] = m.volume;
+                historyMap[m.id] = m.history;
+            });
+        }
+
         // Use filteredMatches for processing
         const marketsToCreate = filteredMatches.map(match => {
             const homeTeam = match.teams.home.name;
