@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '../../utils/supabase/client';
 import { toast } from 'sonner';
 import styles from '../page.module.css'; // Reusing admin styles
+import TableSkeleton from '../../components/TableSkeleton';
 
 export default function UsersAdmin() {
     const supabase = createClient();
@@ -75,7 +76,7 @@ export default function UsersAdmin() {
             </div>
 
             {loading ? (
-                <div>Carregando...</div>
+                <TableSkeleton rows={8} />
             ) : (
                 <div className={styles.card}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>

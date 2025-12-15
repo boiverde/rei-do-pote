@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import styles from './page.module.css';
 import { toast } from 'sonner';
+import TableSkeleton from '../components/TableSkeleton';
 
 export default function AdminPage() {
     const router = useRouter();
@@ -252,7 +253,7 @@ export default function AdminPage() {
             <div className={styles.card}>
                 <h2>Solicitações de Saque Pendentes</h2>
                 {loadingWithdrawals ? (
-                    <p>Carregando saques...</p>
+                    <TableSkeleton rows={3} />
                 ) : withdrawals.length === 0 ? (
                     <p>Nenhuma solicitação pendente.</p>
                 ) : (
