@@ -25,6 +25,8 @@ export default function OrderBook({ match, selectedSide }) {
     const teamName = selectedSide === 'home' ? match.homeTeam : match.awayTeam;
     const basePrice = selectedSide === 'home' ? match.homePrice : match.awayPrice;
 
+    // Removed sync declaration to avoid conflict with state
+
     useEffect(() => {
         // Generate mock bids (Buys) and Asks (Sells) around the current price
         // This is now Client-Side only, preventing hydration mismatch
