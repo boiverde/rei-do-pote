@@ -14,6 +14,28 @@ export async function POST(request) {
         const body = await request.json();
         const { amount, pix_key_type, pix_key } = body;
 
+        // 1. Fetch Profile to verify CPF ownership
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('balance, cpf')
+            .eq('id', user.id)
+            .single();
+
+        if (!profile || !profile.cpf) {
+            return NextResponse.json({ error: 'Você precisa cadastrar seu CPF no perfil antes de sacar.' }, { status: 400 });
+        }
+
+        // 2. Security Check: Key MUST match CPF
+        // Allow simple cleaning (remove . and -) for comparison if needed, but for now exact match is safer / stricter.
+        // Assuming frontend sends cleaned or raw, lets enforce strict equality or simple clean.
+        // Let's Clean both just in case.
+        const cleanKey = pix_key.replace(/\D/g, '');
+        const cleanCpf = profile.cpf.replace(/\D/g, '');
+
+        if (cleanKey !== cleanCpf) {
+            return NextResponse.json({ error: 'A Chave PIX deve ser o seu CPF cadastrado. (Titularidade Obrigatória)' }, { status: 403 });
+        }
+
         if (!amount || amount <= 0) {
             return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
         }
