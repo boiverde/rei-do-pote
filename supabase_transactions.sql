@@ -6,7 +6,10 @@ create table if not exists public.transactions (
   amount decimal(10,2) not null,
   type text not null check (type in ('deposit', 'withdraw')),
   status text not null default 'pending',
-  description text
+  description text,
+  payment_id text unique,
+  external_reference text,
+  metadata jsonb
 );
 
 -- 2. Enable RLS
@@ -47,5 +50,51 @@ begin
   returning balance into v_new_balance;
 
   return json_build_object('success', true, 'new_balance', v_new_balance);
+end;
+$$;
+
+-- 5. Atomic Confirm Deposit Function
+create or replace function public.confirm_deposit(
+  p_payment_id text,
+  p_status text
+) returns json
+language plpgsql
+security definer
+as $$
+declare
+  v_transaction record;
+  v_new_balance decimal;
+  v_user_id uuid;
+begin
+  -- 1. Get Transaction
+  select * into v_transaction 
+  from transactions 
+  where payment_id = p_payment_id;
+
+  if not found then
+    return json_build_object('success', false, 'error', 'Transaction not found');
+  end if;
+
+  if v_transaction.status = 'completed' then
+     return json_build_object('success', true, 'message', 'Already completed');
+  end if;
+
+  -- 2. Update Transaction
+  update transactions 
+  set status = p_status,
+      created_at = now() -- Update time to completion time optional
+  where id = v_transaction.id;
+
+  -- 3. Update Balance if approved
+  if p_status = 'approved' or p_status = 'completed' then
+      update profiles 
+      set balance = balance + v_transaction.amount 
+      where id = v_transaction.user_id
+      returning balance into v_new_balance;
+      
+      return json_build_object('success', true, 'new_balance', v_new_balance);
+  else
+      return json_build_object('success', true, 'message', 'Status updated to ' || p_status);
+  end if;
 end;
 $$;

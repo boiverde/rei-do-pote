@@ -6,8 +6,8 @@ export async function GET(request) {
     const code = requestUrl.searchParams.get('code')
 
     if (code) {
-        const supabaseUrl = 'https://qqupjuyebqaajpvhhwpk.supabase.co'
-        const supabaseAnonKey = 'sb_publishable_S-b2b-pAyD4wwtexHVGeOQ_qTTyuZcE'
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
         const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
         await supabase.auth.exchangeCodeForSession(code)

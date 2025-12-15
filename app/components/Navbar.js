@@ -68,6 +68,9 @@ export default function Navbar() {
                             <div className={styles.balance}>
                                 <span className={styles.balanceLabel}>Saldo</span>
                                 <span className={styles.balanceValue}>R$ {user.balance?.toFixed(2).replace('.', ',') || '0,00'}</span>
+                                <Link href="/deposit" className={styles.depositLink} title="Depositar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                                </Link>
                             </div>
                             <div className={styles.profile}>
                                 {user.user_metadata?.avatar_url && (

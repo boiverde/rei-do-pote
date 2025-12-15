@@ -5,7 +5,6 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import dynamic from 'next/dynamic';
 
-import DepositModal from '../components/DepositModal';
 import Skeleton from '../components/Skeleton';
 
 const PortfolioChart = dynamic(() => import('../components/PortfolioChart'), { ssr: false });
@@ -15,7 +14,6 @@ export default function Portfolio() {
     const [transactions, setTransactions] = useState([]);
     const [balance, setBalance] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
     // Mock History Data (Keep for visual until we have real history table)
     const generateBalanceHistory = () => {
@@ -142,12 +140,9 @@ export default function Portfolio() {
             <div className={styles.balanceCard}>
                 <div className={styles.balanceHeader}>
                     <span>Saldo Disponível</span>
-                    <button
-                        className={styles.depositBtn}
-                        onClick={() => setIsDepositModalOpen(true)}
-                    >
+                    <Link href="/deposit" className={styles.depositBtn}>
                         + Depositar
-                    </button>
+                    </Link>
                 </div>
                 <div className={styles.balanceAmount}>R$ {balance.toFixed(2).replace('.', ',')}</div>
                 <div className={styles.balanceMeta}>Investido: R$ {totalInvested.toFixed(2).replace('.', ',')}</div>
@@ -215,11 +210,7 @@ export default function Portfolio() {
                 )}
             </div>
 
-            <DepositModal
-                isOpen={isDepositModalOpen}
-                onClose={() => setIsDepositModalOpen(false)}
-                onSuccess={handleDepositSuccess}
-            />
+
         </div>
     );
 }
