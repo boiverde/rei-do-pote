@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { createClient as createSessionClient } from '../../utils/supabase/server';
 
 // Init Supabase (Admin Context)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,7 +10,29 @@ export async function POST(request) {
     console.log("Starting Auto-Resolution...");
 
     try {
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        // 1. Security Check (Cron Secret OR Admin Session)
+        const authHeader = request.headers.get('authorization');
+        const isCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+        let isAdmin = false;
+
+        if (!isCron) {
+            const sessionClient = await createSessionClient();
+            const { data: { user } } = await sessionClient.auth.getUser();
+            if (user) {
+                const { data: profile } = await sessionClient
+                    .from('profiles')
+                    .select('is_admin')
+                    .eq('id', user.id)
+                    .single();
+                isAdmin = profile?.is_admin;
+            }
+        }
+
+        if (!isCron && !isAdmin) {
+            return NextResponse.json({ error: 'Unauthorized Access' }, { status: 401 });
+        }
+
+        const supabase = createAdminClient(supabaseUrl, supabaseKey);
 
         // 1. Get Open Markets that are "Past Due" (Event Date < Now)
         // We look back 3 days to catch anything missed.

@@ -3,9 +3,10 @@ import Image from 'next/image';
 import styles from './Navbar.module.css';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
 
 export default function Navbar() {
+    const supabase = createClient();
     const [user, setUser] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
 

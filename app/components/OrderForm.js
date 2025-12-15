@@ -1,11 +1,12 @@
 "use client";
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import styles from './OrderForm.module.css';
 
 export default function OrderForm({ match }) {
+    const supabase = createClient();
     const [selectedSide, setSelectedSide] = useState('home'); // 'home' or 'away'
     const [shares, setShares] = useState(1);
     const [loading, setLoading] = useState(false);

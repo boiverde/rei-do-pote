@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
 import Link from 'next/link';
 import styles from './page.module.css';
 import dynamic from 'next/dynamic';
@@ -10,6 +10,7 @@ import Skeleton from '../components/Skeleton';
 const PortfolioChart = dynamic(() => import('../components/PortfolioChart'), { ssr: false });
 
 export default function Portfolio() {
+    const supabase = createClient();
     const [positions, setPositions] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [balance, setBalance] = useState(0);

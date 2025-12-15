@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
 import styles from './page.module.css';
 import { toast } from 'sonner';
 import TableSkeleton from '../components/TableSkeleton';

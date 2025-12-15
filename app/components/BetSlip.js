@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 import styles from './BetSlip.module.css';
 import { useBetSlip } from '../context/BetSlipContext';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
 import { toast } from 'sonner';
 
 export default function BetSlip() {
+    const supabase = createClient();
     const { bets, removeBet, clearSlip } = useBetSlip();
     const [amounts, setAmounts] = useState({});
     const [loading, setLoading] = useState(false);

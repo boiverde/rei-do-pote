@@ -1,20 +1,38 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { createClient as createSessionClient } from '../../utils/supabase/server';
 import { calculateOdds } from '../../lib/team-ratings';
 import { BIG_TEAMS, EURO_GIANTS } from '../../lib/teams';
 
-// Initialize Supabase Client
-// We use env vars for connection, ensuring server-side security.
+// Initialize Supabase Client (Admin / Service Role)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-// Use Service Role Key for Admin operations (bypasses RLS), fallback to Anon Key (read-only usually)
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// HARDCODED API KEY FOR IMMEDIATE TESTING
-// const API_KEY = process.env.API_FOOTBALL_KEY; // Using direct process.env usage below
 
 export async function POST(request) {
     try {
-        // 1. Fetch from multiple leagues
+        // 1. Security Check (Cron Secret OR Admin Session)
+        const authHeader = request.headers.get('authorization');
+        const isCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+        let isAdmin = false;
+
+        if (!isCron) {
+            const sessionClient = await createSessionClient();
+            const { data: { user } } = await sessionClient.auth.getUser();
+            if (user) {
+                const { data: profile } = await sessionClient
+                    .from('profiles')
+                    .select('is_admin')
+                    .eq('id', user.id)
+                    .single();
+                isAdmin = profile?.is_admin;
+            }
+        }
+
+        if (!isCron && !isAdmin) {
+            return NextResponse.json({ error: 'Unauthorized Access' }, { status: 401 });
+        }
+
+        // 2. Fetch from multiple leagues
         // Target Leagues
         // 71: Brasileirão A, 73: Copa do Brasil, 13: Libertadores, 11: Sul-Americana
         // 39: Premier League, 140: La Liga, 2: Champions League, 15: Mundial (Check ID)
@@ -97,7 +115,8 @@ export async function POST(request) {
         });
 
         // Initialize Supabase Client (Restored)
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        // Initialize Supabase Client (Restored)
+        const supabase = createAdminClient(supabaseUrl, supabaseKey);
 
         // Fetch existing markets to preserve 'volume' and 'history'
         const { data: existingMarkets } = await supabase

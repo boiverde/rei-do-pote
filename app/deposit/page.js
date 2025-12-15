@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/client';
 import styles from './page.module.css';
 import { toast } from 'sonner';
 
 export default function DepositPage() {
+    const supabase = createClient();
     const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(false);
     const [paymentData, setPaymentData] = useState(null);
