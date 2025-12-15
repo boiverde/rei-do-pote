@@ -15,7 +15,9 @@ export async function POST(request) {
     try {
         // 1. Fetch from multiple leagues
         // Target Leagues
-        const targetLeagueIds = [71, 73, 1168, 15];
+        // 71: Brasileirão A, 73: Copa do Brasil, 13: Libertadores, 11: Sul-Americana
+        // 39: Premier League, 140: La Liga, 2: Champions League, 15: Mundial (Check ID)
+        const targetLeagueIds = [71, 73, 13, 11, 39, 140, 2, 1168, 15];
 
         // Fetch methodology for Free Plan:
         // querying by 'season=2025' is blocked on free plan for future seasons.
@@ -85,6 +87,11 @@ export async function POST(request) {
             let leagueName = match.league.name;
             if (match.league.id === 71) leagueName = 'Brasileirão Série A';
             if (match.league.id === 73) leagueName = 'Copa do Brasil';
+            if (match.league.id === 13) leagueName = 'Libertadores';
+            if (match.league.id === 11) leagueName = 'Sul-Americana';
+            if (match.league.id === 39) leagueName = 'Premier League';
+            if (match.league.id === 140) leagueName = 'La Liga';
+            if (match.league.id === 2) leagueName = 'Champions League';
             if (leagueName.includes('Intercontinental') || leagueName.includes('World Cup')) leagueName = 'Mundial de Clubes';
 
             // Helper to slugify (e.g. "Corinthians" -> "cor")

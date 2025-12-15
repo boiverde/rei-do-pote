@@ -1,0 +1,60 @@
+"use client";
+import { useState, useEffect } from 'react';
+import { createClient } from '../utils/supabase/client';
+import styles from './page.module.css';
+
+export default function RankingPage() {
+    const supabase = createClient();
+    const [leaders, setLeaders] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchLeaders();
+    }, []);
+
+    async function fetchLeaders() {
+        setLoading(true);
+        // Simple Leaderboard: Top Balances
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('username, full_name, avatar_url, balance')
+            .order('balance', { ascending: false })
+            .limit(10);
+
+        if (error) {
+            console.error(error);
+        } else {
+            setLeaders(data || []);
+        }
+        setLoading(false);
+    }
+
+    return (
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1>🏆 Ranking Rei do Pote</h1>
+                <p>Os maiores acumuladores da plataforma</p>
+            </div>
+
+            <div className={styles.list}>
+                {loading ? <div className={styles.loading}>Carregando...</div> : (
+                    leaders.map((user, index) => (
+                        <div key={index} className={`${styles.item} ${index < 3 ? styles.top3 : ''}`}>
+                            <div className={styles.rank}>#{index + 1}</div>
+                            <div className={styles.avatar}>
+                                {user.avatar_url ? <img src={user.avatar_url} /> : <div className={styles.placeholder}>👤</div>}
+                            </div>
+                            <div className={styles.info}>
+                                <div className={styles.name}>{user.username || user.full_name || 'Anônimo'}</div>
+                                <div className={styles.balance}>R$ {user.balance?.toFixed(2)}</div>
+                            </div>
+                            {index === 0 && <div className={styles.medal}>🥇</div>}
+                            {index === 1 && <div className={styles.medal}>🥈</div>}
+                            {index === 2 && <div className={styles.medal}>🥉</div>}
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}

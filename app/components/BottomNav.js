@@ -15,9 +15,9 @@ export default function BottomNav() {
                 <span className={styles.label}>Início</span>
             </Link>
 
-            <Link href="/?group=Todos" className={styles.navItem}>
-                <span className={styles.icon}>🔍</span>
-                <span className={styles.label}>Buscar</span>
+            <Link href="/ranking" className={`${styles.navItem} ${isActive('/ranking') ? styles.active : ''}`}>
+                <span className={styles.icon}>🏆</span>
+                <span className={styles.label}>Ranking</span>
             </Link>
 
             {/* Main Action Button (Deposit? Or Live?) */}
