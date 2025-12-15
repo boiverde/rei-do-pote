@@ -5,7 +5,7 @@ create table if not exists public.profiles (
   username text,
   full_name text,
   avatar_url text,
-  balance decimal default 1000.00, -- Give 1000 start balance
+  balance decimal default 0.00, -- Default start balance 0.00
   constraint username_length check (char_length(username) >= 3)
 );
 
@@ -27,7 +27,7 @@ create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.profiles (id, full_name, avatar_url, balance)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url', 1000.00);
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url', 0.00);
   return new;
 end;
 $$ language plpgsql security definer;
@@ -41,7 +41,7 @@ create trigger on_auth_user_created
 -- 5. CRITICAL: Backfill for EXISTING users (You!)
 -- This inserts a profile for any user that already exists but doesn't have a profile.
 insert into public.profiles (id, balance)
-select id, 1000.00
+select id, 0.00
 from auth.users
 where id not in (select id from public.profiles)
 on conflict do nothing;
