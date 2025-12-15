@@ -111,7 +111,9 @@ export default function UsersAdmin() {
                                         R$ {user.balance?.toFixed(2)}
                                     </td>
                                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
-                                        {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                                        {user.created_at
+                                            ? new Date(user.created_at).toLocaleDateString('pt-BR')
+                                            : '-'}
                                     </td>
                                 </tr>
                             ))}
