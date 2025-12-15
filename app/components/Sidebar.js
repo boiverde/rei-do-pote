@@ -39,10 +39,7 @@ export default function Sidebar() {
                     <span className={styles.icon}>⚡</span>
                     <span className={styles.label}>Ao Vivo <span className={styles.badge}>Live</span></span>
                 </div>
-                <Link href="/invite" className={styles.menuItem}>
-                    <span className={styles.icon}>💸</span>
-                    <span className={styles.label}>Convide & Ganhe</span>
-                </Link>
+
                 <Link href="/ranking" className={`${styles.menuItem} ${styles.ranking}`}>
                     <span className={styles.icon}>🏆</span>
                     <span className={styles.label}>Ranking</span>

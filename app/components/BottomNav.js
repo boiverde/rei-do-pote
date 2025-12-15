@@ -27,10 +27,7 @@ export default function BottomNav() {
                 </div>
             </Link>
 
-            <Link href="/invite" className={`${styles.navItem} ${isActive('/invite') ? styles.active : ''}`}>
-                <span className={styles.icon}>💸</span>
-                <span className={styles.label}>Ganhe</span>
-            </Link>
+
 
             <Link href="/portfolio" className={`${styles.navItem} ${isActive('/portfolio') ? styles.active : ''}`}>
                 <span className={styles.icon}>👤</span>
