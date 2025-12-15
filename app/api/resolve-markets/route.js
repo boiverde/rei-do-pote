@@ -59,14 +59,21 @@ export async function POST(request) {
 
         // 3. Match and Resolve
         for (const market of openMarkets) {
-            // Fuzzy match logic or strict match if we stored external ID.
-            // Since we didn't store external ID in explicit column (oops), we try to match by Team Names.
-            // This is "Good Enough" for MVP.
+            let matchResult = null;
 
-            const matchResult = finishedGames.find(g =>
-                (g.teams.home.name === market.home_team || g.teams.home.name.includes(market.home_team)) &&
-                (g.teams.away.name === market.away_team || g.teams.away.name.includes(market.away_team))
-            );
+            // STRATEGY A: Robust ID Match (New Standard)
+            if (market.fixture_id) {
+                matchResult = finishedGames.find(g => g.fixture.id === market.fixture_id);
+            }
+
+            // STRATEGY B: Legacy Name Match (Fallback)
+            // Only if ID is missing or ID match failed (though ID match shouldn't fail if ID is correct)
+            if (!matchResult && !market.fixture_id) {
+                matchResult = finishedGames.find(g =>
+                    (g.teams.home.name === market.home_team || g.teams.home.name.includes(market.home_team)) &&
+                    (g.teams.away.name === market.away_team || g.teams.away.name.includes(market.away_team))
+                );
+            }
 
             if (matchResult) {
                 // Determine Winner

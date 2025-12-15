@@ -165,7 +165,8 @@ export async function POST(request) {
                 home_price: homePrice,
                 away_price: awayPrice,
                 volume: existingVolume,
-                history: existingHistory // explicit preserve
+                history: existingHistory, // explicit preserve
+                fixture_id: match.fixture.id // Store API ID for robust resolution
             };
         });
 
