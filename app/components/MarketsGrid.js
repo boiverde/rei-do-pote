@@ -1,5 +1,6 @@
 import { createClient } from '../utils/supabase/server';
 import MarketCard from './MarketCard';
+import LandingHero from './LandingHero';
 import styles from '../page.module.css';
 
 // Constants for Filtering
@@ -68,7 +69,7 @@ export default async function MarketsGrid({ group, league }) {
     });
 
     if (filteredMatches.length === 0) {
-        return <div className={styles.emptyState}>Nenhum jogo disponível nesta categoria.</div>;
+        return <LandingHero />;
     }
 
     return (
