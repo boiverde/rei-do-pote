@@ -15,18 +15,17 @@ export default function UsersAdmin() {
 
     async function fetchUsers() {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
+        try {
+            const res = await fetch('/api/admin/users');
+            if (!res.ok) throw new Error('Falha ao buscar usuários');
+            const data = await res.json();
+            setUsers(data || []);
+        } catch (error) {
             console.error(error);
             toast.error('Erro ao carregar usuários');
-        } else {
-            setUsers(data || []);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     return (
