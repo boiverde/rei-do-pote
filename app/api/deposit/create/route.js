@@ -1,17 +1,13 @@
 import { NextResponse } from 'next/server';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '../../../utils/supabase/server';
 
-const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
-const payment = new Payment(client);
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+const mpClient = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+const payment = new Payment(mpClient);
 
 export async function POST(request) {
     try {
+        const supabase = await createClient();
         const { amount, user_id, email, description } = await request.json();
 
         if (!amount || !user_id || !email) {
