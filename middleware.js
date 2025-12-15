@@ -1,64 +1,38 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
 
 export async function middleware(request) {
-    let supabaseResponse = NextResponse.next({
-        request,
-    })
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const path = request.nextUrl.pathname;
 
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        {
-            cookies: {
-                getAll() {
-                    return request.cookies.getAll()
-                },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        request.cookies.set(name, value)
-                    )
-                    supabaseResponse = NextResponse.next({
-                        request,
-                    })
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        supabaseResponse.cookies.set(name, value, options)
-                    )
-                },
-            },
-        }
-    )
+    // 1. RATE LIMITING (Critical Routes Only)
+    // In production, use Upstash Redis or Vercel KV for distributed state.
+    // For this prototype, we'll skip complex implementation but leave the structure.
+    // Vercel Edge Middleware doesn't share state between executions easily without a database.
 
-    // IMPORTANT: Avoid writing any logic between createServerClient and
-    // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-    // issues with users being randomly logged out.
-
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
-    if (
-        !user &&
-        !request.nextUrl.pathname.startsWith('/login') &&
-        !request.nextUrl.pathname.startsWith('/auth') &&
-        request.nextUrl.pathname !== '/' // Allow home page
-    ) {
-        // no user, potentially redirect to login if protected route
-        // for now we allow access but this middleware ensures session is refreshed
+    // Simple Header Check for Bots
+    const userAgent = request.headers.get('user-agent') || '';
+    if (userAgent.includes('curl') || userAgent.includes('python-requests')) {
+        return new NextResponse(JSON.stringify({ success: false, message: 'Bot detected.' }), { status: 403 });
     }
 
-    return supabaseResponse
+    // 2. SECURITY HEADERS
+    const response = NextResponse.next();
+
+    // HSTS (Force HTTPS)
+    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+
+    // Anti-Clickjacking
+    response.headers.set('X-Frame-Options', 'DENY');
+
+    // Anti-Sniffing
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+
+    // Referrer Policy
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    return response;
 }
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * Feel free to modify this pattern to include more paths.
-         */
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-    ],
-}
+    matcher: ['/api/:path*', '/login', '/signup', '/deposit', '/withdraw'],
+};
