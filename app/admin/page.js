@@ -11,7 +11,12 @@ export default function AdminPage() {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [syncing, setSyncing] = useState(false); // Fix: Add missing state
-    const [submitMessage, setSubmitMessage] = useState(null); // For submit feedback
+
+    const [submitMessage, setSubmitMessage] = useState(null);
+
+    // Withdrawal State
+    const [withdrawals, setWithdrawals] = useState([]);
+    const [loadingWithdrawals, setLoadingWithdrawals] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -54,6 +59,70 @@ export default function AdminPage() {
         };
         checkAdmin();
     }, [router]);
+
+    // 2. Fetch Pending Withdrawals
+    useEffect(() => {
+        if (isAuthorized) {
+            fetchWithdrawals();
+        }
+    }, [isAuthorized]);
+
+    const fetchWithdrawals = async () => {
+        setLoadingWithdrawals(true);
+        const { data, error } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('type', 'withdraw')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching withdrawals:', error);
+            toast.error('Erro ao buscar saques.');
+        } else {
+            setWithdrawals(data || []);
+        }
+        setLoadingWithdrawals(false);
+    };
+
+    const handleApproveWithdrawal = async (id, amount) => {
+        if (!confirm(`Confirmar que você JÁ FEZ O PIX de R$ ${amount}?`)) return;
+
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .update({ status: 'completed' }) // 'completed' is often used for 'paid'
+                .eq('id', id);
+
+            if (error) throw error;
+
+            toast.success('Saque marcado como concluído!');
+            fetchWithdrawals(); // Refresh list
+        } catch (err) {
+            toast.error('Erro ao atualizar: ' + err.message);
+        }
+    };
+
+    const handleRejectWithdrawal = async (id) => {
+        // Ideally we would refund the balance here via RPC, lets assume we have a way or just mark failed for now.
+        // For verified functionality, lets imply a refund rpc needs to exist OR we manual fix DB.
+        // Lets just allow marking as 'failed' for now.
+        if (!confirm(`Rejeitar saque? O saldo NÃO será estornado automaticamente (ainda).`)) return;
+
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .update({ status: 'failed' })
+                .eq('id', id);
+
+            if (error) throw error;
+
+            toast.success('Saque rejeitado.');
+            fetchWithdrawals();
+        } catch (err) {
+            toast.error('Erro ao rejeitar: ' + err.message);
+        }
+    };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -178,6 +247,56 @@ export default function AdminPage() {
                         💰 Pagar Vencedores (Auto)
                     </button>
                 </div>
+            </div>
+
+            <div className={styles.card}>
+                <h2>Solicitações de Saque Pendentes</h2>
+                {loadingWithdrawals ? (
+                    <p>Carregando saques...</p>
+                ) : withdrawals.length === 0 ? (
+                    <p>Nenhuma solicitação pendente.</p>
+                ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                        <thead>
+                            <tr style={{ textAlign: 'left', borderBottom: '1px solid #333' }}>
+                                <th style={{ padding: '8px' }}>Data</th>
+                                <th style={{ padding: '8px' }}>Valor</th>
+                                <th style={{ padding: '8px' }}>Chave PIX</th>
+                                <th style={{ padding: '8px' }}>Status</th>
+                                <th style={{ padding: '8px' }}>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {withdrawals.map((w) => (
+                                <tr key={w.id} style={{ borderBottom: '1px solid #222' }}>
+                                    <td style={{ padding: '8px' }}>{new Date(w.created_at).toLocaleDateString()}</td>
+                                    <td style={{ padding: '8px', color: '#ef4444', fontWeight: 'bold' }}>
+                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(w.amount)}
+                                    </td>
+                                    <td style={{ padding: '8px' }}>
+                                        {/* Metadata stored in JSONB, handle safe access */}
+                                        {w.metadata?.pix_key_type}: {w.metadata?.pix_key}
+                                    </td>
+                                    <td style={{ padding: '8px' }}>{w.status}</td>
+                                    <td style={{ padding: '8px' }}>
+                                        <button
+                                            onClick={() => handleApproveWithdrawal(w.id, w.amount)}
+                                            style={{ background: '#22c55e', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', marginRight: '5px' }}
+                                        >
+                                            ✅ Pagar
+                                        </button>
+                                        <button
+                                            onClick={() => handleRejectWithdrawal(w.id)}
+                                            style={{ background: '#ef4444', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+                                        >
+                                            ❌
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
 
             <div className={styles.card}>
