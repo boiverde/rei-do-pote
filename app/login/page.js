@@ -5,6 +5,7 @@ import styles from './login.module.css';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
+    const supabase = createClient();
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
