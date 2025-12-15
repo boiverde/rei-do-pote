@@ -104,64 +104,65 @@ export async function POST(request) {
                     logs.push(`❌ Erro RPC ${market.id}: ${rpcError.message}`);
                 } else {
                     logs.push(`✅ Resolvido: ${market.home_team} x ${market.away_team} -> Vencedor: ${winner.toUpperCase()}`);
-                } else {
-                    logs.push(`⏳ Jogo não encontrado ou não finalizado na API: ${market.home_team} x ${market.away_team}`);
                 }
+            } else {
+                logs.push(`⏳ Jogo não encontrado ou não finalizado na API: ${market.home_team} x ${market.away_team}`);
             }
+        }
 
-            // 4. Resolve P2P Challenges
-            // We also need to check 'challenges' table for 'matched' bets on these finished fixtures.
-            if (finishedGames.length > 0) {
-                // Get all matched challenges linked to finished fixtures
-                const finishedFixtureIds = finishedGames.map(g => g.fixture.id);
-                const { data: challenges, error: chalError } = await supabase
-                    .from('challenges')
-                    .select('*')
-                    .eq('status', 'matched')
-                    .in('fixture_id', finishedFixtureIds);
+        // 4. Resolve P2P Challenges
+        // We also need to check 'challenges' table for 'matched' bets on these finished fixtures.
+        if (finishedGames.length > 0) {
+            // Get all matched challenges linked to finished fixtures
+            const finishedFixtureIds = finishedGames.map(g => g.fixture.id);
+            const { data: challenges, error: chalError } = await supabase
+                .from('challenges')
+                .select('*')
+                .eq('status', 'matched')
+                .in('fixture_id', finishedFixtureIds);
 
-                if (challenges && challenges.length > 0) {
-                    for (const challenge of challenges) {
-                        const matchResult = finishedGames.find(g => g.fixture.id === challenge.fixture_id);
-                        if (matchResult) {
-                            let winner = 'draw';
-                            const goalsHome = matchResult.goals.home;
-                            const goalsAway = matchResult.goals.away;
+            if (challenges && challenges.length > 0) {
+                for (const challenge of challenges) {
+                    const matchResult = finishedGames.find(g => g.fixture.id === challenge.fixture_id);
+                    if (matchResult) {
+                        let winner = 'draw';
+                        const goalsHome = matchResult.goals.home;
+                        const goalsAway = matchResult.goals.away;
 
-                            // Check Penalties (if relevant for X1? Usually 90min, but let's stick to standard win logic)
-                            if (matchResult.score.penalty.home !== null) {
-                                if (matchResult.score.penalty.home > matchResult.score.penalty.away) winner = 'home';
-                                else winner = 'away';
-                            } else {
-                                if (goalsHome > goalsAway) winner = 'home';
-                                else if (goalsAway > goalsHome) winner = 'away';
-                            }
+                        // Check Penalties (if relevant for X1? Usually 90min, but let's stick to standard win logic)
+                        if (matchResult.score.penalty.home !== null) {
+                            if (matchResult.score.penalty.home > matchResult.score.penalty.away) winner = 'home';
+                            else winner = 'away';
+                        } else {
+                            if (goalsHome > goalsAway) winner = 'home';
+                            else if (goalsAway > goalsHome) winner = 'away';
+                        }
 
-                            console.log(`Resolving Challenge ${challenge.id}: Result ${winner}`);
-                            const { error: rpcError } = await supabase.rpc('resolve_challenge', {
-                                p_challenge_id: challenge.id,
-                                p_winning_outcome: winner
-                            });
+                        console.log(`Resolving Challenge ${challenge.id}: Result ${winner}`);
+                        const { error: rpcError } = await supabase.rpc('resolve_challenge', {
+                            p_challenge_id: challenge.id,
+                            p_winning_outcome: winner
+                        });
 
-                            if (rpcError) {
-                                logs.push(`❌ Erro Desafio ${challenge.id}: ${rpcError.message}`);
-                            } else {
-                                logs.push(`✅ Desafio Resolvido: ${challenge.match_name}`);
-                                resolvedCount++;
-                            }
+                        if (rpcError) {
+                            logs.push(`❌ Erro Desafio ${challenge.id}: ${rpcError.message}`);
+                        } else {
+                            logs.push(`✅ Desafio Resolvido: ${challenge.match_name}`);
+                            resolvedCount++;
                         }
                     }
                 }
             }
-
-            return NextResponse.json({
-                success: true,
-                resolved: resolvedCount,
-                logs: logs
-            });
-
-        } catch (error) {
-            console.error('Auto-Resolve Error:', error);
-            return NextResponse.json({ success: false, error: error.message }, { status: 500 });
         }
+
+        return NextResponse.json({
+            success: true,
+            resolved: resolvedCount,
+            logs: logs
+        });
+
+    } catch (error) {
+        console.error('Auto-Resolve Error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
+}
