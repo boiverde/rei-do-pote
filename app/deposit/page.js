@@ -1,14 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import styles from './page.module.css';
-import { toast } from 'sonner';
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from '../lib/supabase';
 
 export default function DepositPage() {
     const [amount, setAmount] = useState('');
