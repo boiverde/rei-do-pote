@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function middleware(request) {
-    letsupabaseResponse = NextResponse.next({
+    let supabaseResponse = NextResponse.next({
         request,
     })
 
