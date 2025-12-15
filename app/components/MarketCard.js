@@ -1,4 +1,4 @@
-"use client";
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './MarketCard.module.css';
 import { useBetSlip } from '../context/BetSlipContext';
@@ -75,45 +75,42 @@ export default function MarketCard({ match }) {
                 {match.volume && <span className={styles.volume}>Vol: {match.volume}</span>}
             </div>
 
-            {/* Teams & Prices List */}
-            <div className={styles.teamsList}>
-                {/* Home Row */}
-                <div className={styles.teamRow}>
-                    <Link href={`/market/${match.id}`} className={styles.teamInfo}>
-                        {match.homeLogo ? (
-                            <img src={match.homeLogo} alt="" className={styles.logo} />
-                        ) : (
-                            <div className={`${styles.logo} ${styles.placeholderLogo}`}>🛡️</div>
-                        )}
-                        <span className={styles.teamName}>{match.homeTeam}</span>
-                    </Link>
-                    <button
-                        className={`${styles.priceBtn} ${isSelected('home') ? styles.selected : ''}`}
-                        onClick={() => handleToggle('home')}
-                    >
-                        <span className={styles.value}>R$ {homePrice.toFixed(2)}</span>
-                    </button>
-                </div>
-
-                {/* Away Row */}
-                <div className={styles.teamRow}>
-                    <Link href={`/market/${match.id}`} className={styles.teamInfo}>
-                        {match.awayLogo ? (
-                            <img src={match.awayLogo} alt="" className={styles.logo} />
-                        ) : (
-                            <div className={`${styles.logo} ${styles.placeholderLogo}`}>🛡️</div>
-                        )}
-                        <span className={styles.teamName}>{match.awayTeam}</span>
-                    </Link>
-                    <button
-                        className={`${styles.priceBtn} ${isSelected('away') ? styles.selected : ''}`}
-                        onClick={() => handleToggle('away')}
-                    >
-                        <span className={styles.value}>R$ {awayPrice.toFixed(2)}</span>
-                    </button>
-                </div>
+            {/* Home Row */}
+            <div className={styles.teamRow}>
+                <Link href={`/market/${match.id}`} className={styles.teamInfo}>
+                    {match.homeLogo ? (
+                        <Image src={match.homeLogo} alt={match.homeTeam} width={32} height={32} className={styles.logo} />
+                    ) : (
+                        <div className={`${styles.logo} ${styles.placeholderLogo}`}>🛡️</div>
+                    )}
+                    <span className={styles.teamName}>{match.homeTeam}</span>
+                </Link>
+                <button
+                    className={`${styles.priceBtn} ${isSelected('home') ? styles.selected : ''}`}
+                    onClick={() => handleToggle('home')}
+                >
+                    <span className={styles.value}>R$ {homePrice.toFixed(2)}</span>
+                </button>
             </div>
 
+            {/* Away Row */}
+            <div className={styles.teamRow}>
+                <Link href={`/market/${match.id}`} className={styles.teamInfo}>
+                    {match.awayLogo ? (
+                        <Image src={match.awayLogo} alt={match.awayTeam} width={32} height={32} className={styles.logo} />
+                    ) : (
+                        <div className={`${styles.logo} ${styles.placeholderLogo}`}>🛡️</div>
+                    )}
+                    <span className={styles.teamName}>{match.awayTeam}</span>
+                </Link>
+                <button
+                    className={`${styles.priceBtn} ${isSelected('away') ? styles.selected : ''}`}
+                    onClick={() => handleToggle('away')}
+                >
+                    <span className={styles.value}>R$ {awayPrice.toFixed(2)}</span>
+                </button>
+            </div>
+            {/* Pool Info */}
             {(match.homePool > 0) && (
                 <div className={styles.poolInfo}>
                     Pool Dinâmico • Taxa 10%

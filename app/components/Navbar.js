@@ -85,6 +85,7 @@ export default function Navbar() {
                 <div className={styles.links}>
                     <Link href="/" className={styles.link}>Mercados</Link>
                     <Link href="/portfolio" className={styles.link}>Carteira</Link>
+                    <Link href="/challenges" className={styles.link}>Desafios X1 <span style={{ fontSize: '10px', verticalAlign: 'top' }}>🔥</span></Link>
                     {isAdmin && (
                         <Link href="/admin" className={`${styles.link} ${styles.adminLink}`}>
                             Admin

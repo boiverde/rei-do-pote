@@ -1,0 +1,140 @@
+.container {
+    padding: 20px;
+    padding-bottom: 80px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.step h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--primary);
+}
+
+.marketList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.marketItem {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.marketItem:hover {
+    background: #333;
+}
+
+.teams {
+    font-weight: bold;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.vs {
+    color: var(--text-secondary);
+}
+
+.date {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.backBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.selectedMatch {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: 8px;
+}
+
+.formGroup {
+    margin-bottom: 24px;
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.pickOptions {
+    display: flex;
+    gap: 12px;
+}
+
+.pickBtn {
+    flex: 1;
+    padding: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.pickBtn.active {
+    background: var(--primary);
+    color: black;
+    border-color: var(--primary);
+}
+
+.input {
+    width: 100%;
+    padding: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+}
+
+.summary {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.note {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 16px;
+    background: #ef4444;
+    /* Aggressive color for action */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submitBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
