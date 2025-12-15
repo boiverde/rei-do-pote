@@ -21,10 +21,19 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
         }
 
-        // TODO: Add stricter Admin Role check here (e.g., if user.email === 'admin@bolaobr.com')
-        // For now, we assume access to the Admin Page is guarded by layout/middleware, but this API protection is crucial.
+        // 3. Admin Authorization Check
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
 
-        // 3. Fetch Data (Securely)
+        // If not admin, block.
+        if (profileError || !profile || !profile.is_admin) {
+            return NextResponse.json({ error: 'Forbidden: Admins only' }, { status: 403 });
+        }
+
+        // 4. Fetch Data
         const { data: users, error } = await supabase
             .from('profiles')
             .select('*')

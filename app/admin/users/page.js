@@ -10,28 +10,51 @@ export default function UsersAdmin() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchUsers();
+        checkAuth();
     }, []);
 
-    async function fetchUsers() {
+    async function checkAuth() {
         setLoading(true);
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            const token = session?.access_token;
+            if (!session) {
+                // Not logged in
+                return;
+            }
 
-            if (!token) throw new Error('Não autenticado');
+            // Check Admin Role
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', session.user.id)
+                .single();
 
+            if (!profile?.is_admin) {
+                toast.error('Acesso negado.');
+                return; // Stop here, dont fetch users
+            }
+
+            // Only fetch if admin
+            fetchUsers(session.access_token);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function fetchUsers(token) {
+        try {
             const res = await fetch('/api/admin/users', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            if (res.status === 403) throw new Error('Acesso negado (403)');
             if (!res.ok) throw new Error('Falha ao buscar usuários');
             const data = await res.json();
             setUsers(data || []);
         } catch (error) {
             console.error(error);
-            toast.error('Erro ao carregar usuários');
+            toast.error('Erro: ' + error.message);
         } finally {
             setLoading(false);
         }
