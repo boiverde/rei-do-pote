@@ -39,6 +39,10 @@ export default function Sidebar() {
                     <span className={styles.icon}>⚡</span>
                     <span className={styles.label}>Ao Vivo <span className={styles.badge}>Live</span></span>
                 </div>
+                <Link href="/invite" className={styles.menuItem}>
+                    <span className={styles.icon}>💸</span>
+                    <span className={styles.label}>Convide & Ganhe</span>
+                </Link>
             </div>
 
             {/* Dynamic Leagues */}
