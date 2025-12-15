@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { createClient } from '../utils/supabase/server';
 import MarketCard from './MarketCard';
 import styles from '../page.module.css';
 
@@ -11,6 +11,7 @@ const FILTER_GROUPS = {
 
 // Data Fetching logic
 async function getMarkets() {
+    const supabase = await createClient();
     const nowISO = new Date().toISOString();
     const { data, error } = await supabase
         .from('markets')
