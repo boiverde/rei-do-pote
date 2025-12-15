@@ -38,3 +38,4 @@ export default async function ChallengePage({ params }) {
     const resolvedParams = await params;
     return <ChallengeClient params={resolvedParams} />;
 }
+// Forced update to trigger deploy
