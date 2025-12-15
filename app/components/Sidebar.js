@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import styles from './Sidebar.module.css';
 
 const FILTER_GROUPS = {
-    "Nacional": ["Brasileirão Série A", "Copa do Brasil"],
+    "Nacional": ["Brasileirão Série A", "Copa do Brasil", "Clássicos Estaduais"],
     "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes", "Premier League", "La Liga"]
 };
 

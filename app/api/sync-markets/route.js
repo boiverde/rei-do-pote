@@ -61,25 +61,62 @@ export async function POST(request) {
             return NextResponse.json({ success: false, message: 'Nenhum jogo oficial encontrado nas ligas monitoradas (próximos 5 dias).' }, { status: 404 });
         }
 
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        // Whitelist of "Big Teams" for South American Context
+        const BIG_TEAMS = [
+            'Flamengo', 'Vasco da Gama', 'Fluminense', 'Botafogo', // RJ
+            'Corinthians', 'Palmeiras', 'São Paulo', 'Santos', // SP
+            'Grêmio', 'Internacional', // RS
+            'Atlético Mineiro', 'Cruzeiro', // MG
+            'Bahia', 'Vitória', // BA
+            'Fortaleza', 'Ceará', // CE
+            'Sport Recife', 'Santa Cruz', 'Náutico', // PE
+            'Athletico Paranaense', 'Coritiba' // PR
+        ];
 
-        // 2a. Fetch existing markets to preserve 'volume' and 'history'
-        // We only need ID and Volume for the ones we are about to update.
-        const { data: existingMarkets } = await supabase
-            .from('markets')
-            .select('id, volume, history');
+        // Whitelist for International European Giants (Classics Only)
+        const EURO_GIANTS = [
+            'Real Madrid', 'Barcelona', 'Atletico Madrid', 'Sevilla', // SPA
+            'Manchester City', 'Manchester United', 'Liverpool', 'Arsenal', 'Chelsea', 'Tottenham', // ENG
+            'Bayern Munich', 'Borussia Dortmund', 'Bayer Leverkusen', // GER
+            'Paris Saint-Germain', 'Marseille', 'Lyon', // FRA
+            'Juventus', 'AC Milan', 'Inter', 'Napoli', 'Roma', // ITA
+            'Benfica', 'Porto', 'Sporting CP', // POR
+            'Ajax', 'PSV Eindhoven' // NED
+        ];
 
-        const volumeMap = {};
-        const historyMap = {};
-        if (existingMarkets) {
-            existingMarkets.forEach(m => {
-                volumeMap[m.id] = m.volume;
-                historyMap[m.id] = m.history;
-            });
-        }
+        // League Categories
+        const LEAGUES_BR = [71, 73]; // Brasileirão, Copa Brasil -> KEEP ALL
+        const LEAGUES_INTL_SA = [13, 11, 15]; // Liberta, Sula, Mundial -> KEEP IF BR TEAM INVOLVED
+        const LEAGUES_EURO = [39, 140, 2]; // Premier, La Liga, Champions -> KEEP IF CLASSIC (BOTH GIANTS)
 
-        // 2b. Transform Data
-        const marketsToCreate = allMatches.map(match => {
+        // Filter Logic:
+        const filteredMatches = allMatches.filter(match => {
+            const leagueId = match.league.id;
+
+            // 1. National (BR) - Always keep
+            if (LEAGUES_BR.includes(leagueId)) return true;
+
+            // 2. Intl South America (Liberta/Sula/Mundial) - Keep if BR team involved
+            if (LEAGUES_INTL_SA.includes(leagueId)) {
+                return BIG_TEAMS.includes(match.teams.home.name) || BIG_TEAMS.includes(match.teams.away.name);
+            }
+
+            // 3. Europe (Premier, La Liga, Champions) - Keep IF Classic (BOTH must be Giants)
+            if (LEAGUES_EURO.includes(leagueId)) {
+                const homeGiant = EURO_GIANTS.includes(match.teams.home.name);
+                const awayGiant = EURO_GIANTS.includes(match.teams.away.name);
+                return homeGiant && awayGiant;
+            }
+
+            // 4. Regionals/State (Others) - Keep if BR Big Team involved
+            // If it's not in the lists above but was fetched (via date search), it's likely a state league.
+            const homeBig = BIG_TEAMS.includes(match.teams.home.name);
+            const awayBig = BIG_TEAMS.includes(match.teams.away.name);
+            return homeBig || awayBig;
+        });
+
+        // Use filteredMatches for processing
+        const marketsToCreate = filteredMatches.map(match => {
             const homeTeam = match.teams.home.name;
             const awayTeam = match.teams.away.name;
 
@@ -93,6 +130,11 @@ export async function POST(request) {
             if (match.league.id === 140) leagueName = 'La Liga';
             if (match.league.id === 2) leagueName = 'Champions League';
             if (leagueName.includes('Intercontinental') || leagueName.includes('World Cup')) leagueName = 'Mundial de Clubes';
+
+            // Map known State Leagues or ANY other league to 'Clássicos Estaduais' if it passed the Big Team filter but isn't a target ID
+            if (!targetLeagueIds.includes(match.league.id)) {
+                leagueName = 'Clássicos Estaduais';
+            }
 
             // Helper to slugify (e.g. "Corinthians" -> "cor")
             const slugify = (text) => text.toLowerCase().replace(/[^a-z]/g, '').slice(0, 3);
