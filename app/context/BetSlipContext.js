@@ -10,6 +10,7 @@ export function BetSlipProvider({ children }) {
     // Load from local storage on mount
     useEffect(() => {
         const saved = localStorage.getItem('betslip');
+        // eslint-disable-next-line
         if (saved) setBets(JSON.parse(saved));
     }, []);
 

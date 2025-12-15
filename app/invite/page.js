@@ -8,10 +8,6 @@ export default function InvitePage() {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ referred_count: 0, earnings: 0 });
 
-    useEffect(() => {
-        fetchReferralData();
-    }, []);
-
     const fetchReferralData = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {

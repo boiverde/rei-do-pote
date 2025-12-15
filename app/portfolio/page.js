@@ -16,6 +16,9 @@ export default function Portfolio() {
     const [loading, setLoading] = useState(true);
 
     // Mock History Data (Keep for visual until we have real history table)
+    const [historyData, setHistoryData] = useState([]);
+
+    // Mock History Data (Keep for visual until we have real history table)
     const generateBalanceHistory = () => {
         const history = [];
         let currentBalance = 900;
@@ -32,7 +35,10 @@ export default function Portfolio() {
         }
         return history;
     };
-    const historyData = generateBalanceHistory();
+
+    useEffect(() => {
+        setHistoryData(generateBalanceHistory());
+    }, []);
 
     const fetchPortfolio = async () => {
         const { data: { session } } = await supabase.auth.getSession();

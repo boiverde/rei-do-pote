@@ -1,6 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import styles from './OrderBook.module.css';
 
 export default function OrderBook({ match, selectedSide }) {
+    const [asks, setAsks] = useState([]);
+    const [bids, setBids] = useState([]);
+
     // Mock data generator for order book
     const generateOrders = (basePrice, isBuy) => {
         const orders = [];
@@ -21,9 +25,12 @@ export default function OrderBook({ match, selectedSide }) {
     const teamName = selectedSide === 'home' ? match.homeTeam : match.awayTeam;
     const basePrice = selectedSide === 'home' ? match.homePrice : match.awayPrice;
 
-    // Generate mock bids (Buys) and Asks (Sells) around the current price
-    const asks = generateOrders(basePrice, false).reverse(); // Sellers want higher prices
-    const bids = generateOrders(basePrice, true);  // Buyers want lower prices
+    useEffect(() => {
+        // Generate mock bids (Buys) and Asks (Sells) around the current price
+        // This is now Client-Side only, preventing hydration mismatch
+        setAsks(generateOrders(basePrice, false).reverse());
+        setBids(generateOrders(basePrice, true));
+    }, [basePrice, selectedSide]); // Re-run if props change
 
     return (
         <div className={styles.container}>

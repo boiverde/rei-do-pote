@@ -8,10 +8,6 @@ export default function RankingPage() {
     const [leaders, setLeaders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchLeaders();
-    }, []);
-
     async function fetchLeaders() {
         setLoading(true);
         // Simple Leaderboard: Top Balances
@@ -28,6 +24,10 @@ export default function RankingPage() {
         }
         setLoading(false);
     }
+
+    useEffect(() => {
+        fetchLeaders();
+    }, []);
 
     return (
         <div className={styles.container}>
