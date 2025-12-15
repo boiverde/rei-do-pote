@@ -1,9 +1,46 @@
 import { NextResponse } from 'next/server';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 const payment = new Payment(client);
+
+// Helper: Verify Signature
+function verifySignature(request, queryId) {
+    const secret = process.env.MP_WEBHOOK_SECRET;
+    if (!secret) {
+        console.warn("⚠️ MP_WEBHOOK_SECRET missing. Skipping signature verification.");
+        return true; // Allow for now to not break prod, but warn
+    }
+
+    const xSignature = request.headers.get('x-signature');
+    const xRequestId = request.headers.get('x-request-id');
+
+    if (!xSignature || !xRequestId) return false;
+
+    // Parse ts and v1 from x-signature (e.g., "ts=123456,v1=abcdef")
+    const parts = xSignature.split(',');
+    let ts = null;
+    let v1 = null;
+
+    parts.forEach(p => {
+        const [key, val] = p.split('=');
+        if (key.trim() === 'ts') ts = val;
+        if (key.trim() === 'v1') v1 = val;
+    });
+
+    if (!ts || !v1) return false;
+
+    // Create Manifest string: "id:[data.id];request-id:[x-request-id];ts:[ts];"
+    // Note: MP docs say data.id, which usually matches the query ID for valid events
+    const manifest = `id:${queryId};request-id:${xRequestId};ts:${ts};`;
+
+    const hmac = crypto.createHmac('sha256', secret);
+    const digest = hmac.update(manifest).digest('hex');
+
+    return digest === v1;
+}
 
 // Use Service Role Key for Webhook as it operates backend-side without user session
 const supabase = createClient(
@@ -31,6 +68,14 @@ export async function POST(request) {
 
         if (!paymentId) {
             return NextResponse.json({ ok: true }); // Acknowledge even if irrelevant event
+        }
+
+        // Security: Verify Signature
+        // We pass the paymentId as the data.id part of the manifest
+        const isValid = verifySignature(request, paymentId);
+        if (!isValid && process.env.MP_WEBHOOK_SECRET) {
+            console.error(`Invalid Webhook Signature for ID: ${paymentId}`);
+            return NextResponse.json({ error: 'Invalid Signature' }, { status: 403 });
         }
 
         // Verify status with MP
