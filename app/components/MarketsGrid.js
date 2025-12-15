@@ -5,8 +5,8 @@ import styles from '../page.module.css';
 // Constants for Filtering
 const FILTER_GROUPS = {
     "Todos": [],
-    "Nacional": ["Brasileirão", "Copa do Brasil"],
-    "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes", "Champions League"]
+    "Nacional": ["Brasileirão Série A", "Copa do Brasil"],
+    "Internacional": ["Libertadores", "Sul-Americana", "Mundial de Clubes", "Premier League", "La Liga", "Champions League"]
 };
 
 // Data Fetching logic

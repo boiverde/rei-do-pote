@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import BetSlip from "./components/BetSlip";
+import BottomNav from "./components/BottomNav";
 import { Providers } from "./providers";
 import { Toaster } from 'sonner';
 import { Suspense } from 'react';
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
             <BetSlip />
           </Providers>
         </div>
+        <BottomNav />
         <Toaster richColors position="top-right" />
       </body>
     </html>

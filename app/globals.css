@@ -145,3 +145,9 @@ a {
   flex: 1;
   padding: 24px;
 }
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: 90px;
+  }
+}

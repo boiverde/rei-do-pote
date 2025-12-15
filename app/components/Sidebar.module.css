@@ -13,6 +13,12 @@
     gap: 24px;
 }
 
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+}
+
 .section {
     display: flex;
     flex-direction: column;
