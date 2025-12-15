@@ -6,12 +6,12 @@ export default function LandingHero() {
     return (
         <section className={styles.hero}>
             <h1 className={styles.title}>
-                O Rei do Pote <br />
+                Rei do Pote - Fantasy Game <br />
                 <span className={styles.TitleHighlight}>Onde seu palpite vale Ouro.</span>
             </h1>
 
             <p className={styles.subtitle}>
-                A plataforma definitiva de apostas esportivas. Crie ligas, desafie seus amigos no X1 ou mostre que você entende tudo de futebol nos grandes campeonatos.
+                O Fantasy Game definitivo. Monte sua estratégia, crie ligas, desafie seus amigos no X1 ou mostre que você entende tudo de futebol.
             </p>
 
             <div className={styles.ctaGroup}>

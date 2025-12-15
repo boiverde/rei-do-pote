@@ -14,14 +14,14 @@ export default function Navbar() {
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
-                // Fetch Profile (Balance + Admin)
+                // Fetch Profile (Balance + Admin + XP)
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('is_admin, balance')
+                    .select('is_admin, balance, xp')
                     .eq('id', session.user.id)
                     .single();
 
-                setUser({ ...session.user, balance: profile?.balance || 0 });
+                setUser({ ...session.user, balance: profile?.balance || 0, xp: profile?.xp || 0 });
                 setIsAdmin(profile?.is_admin || false);
             } else {
                 setUser(null);
@@ -97,6 +97,14 @@ export default function Navbar() {
                     {user ? (
                         <>
                             <div className={styles.balance}>
+                                {/* XP Badge */}
+                                <div className={styles.xpBadge} title="Pontos de Experiência (Fantasy)">
+                                    <span className={styles.xpIcon}>⭐</span>
+                                    <span className={styles.xpValue}>{user.xp || 0} XP</span>
+                                </div>
+
+                                <div className={styles.divider}></div>
+
                                 <span className={styles.balanceLabel}>Saldo</span>
                                 <span className={styles.balanceValue}>R$ {user.balance?.toFixed(2).replace('.', ',') || '0,00'}</span>
                                 <Link href="/deposit" className={styles.depositLink} title="Depositar">

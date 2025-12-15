@@ -12,19 +12,19 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: {
-    template: '%s | Rei do Pote',
-    default: 'Rei do Pote | O Melhor Bolão Online',
+    template: '%s | Rei do Pote - Fantasy Game',
+    default: 'Rei do Pote | O Melhor Fantasy Game do Brasil',
   },
   description: "Dê seus palpites, desafie amigos e suba no ranking. A melhor plataforma de fantasy game de futebol do Brasil.",
-  keywords: ['bolão', 'futebol', 'apostas', 'brasileirão', 'champions league', 'fantasy game'],
+  keywords: ['fantasy game', 'bolão', 'futebol', 'apostas', 'brasileirão', 'champions league'],
   authors: [{ name: 'Rei do Pote' }],
   creator: 'Rei do Pote',
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://rei-do-pote-vzvb.vercel.app/',
-    siteName: 'Rei do Pote',
-    title: 'Rei do Pote | O Melhor Bolão Online',
+    url: 'https://rei-do-pote-point.vercel.app/',
+    siteName: 'Rei do Pote - Fantasy Game',
+    title: 'Rei do Pote | O Melhor Fantasy Game do Brasil',
     description: 'Dê seus palpites, desafie amigos e suba no ranking. A melhor plataforma de fantasy game de futebol do Brasil.',
     images: [
       {
