@@ -7,7 +7,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function generateMetadata({ params }) {
-    const { id } = params;
+    const { id } = await params;
 
     const { data: challenge } = await supabase
         .from('challenges')
@@ -34,6 +34,7 @@ export async function generateMetadata({ params }) {
     };
 }
 
-export default function ChallengePage({ params }) {
-    return <ChallengeClient params={params} />;
+export default async function ChallengePage({ params }) {
+    const resolvedParams = await params;
+    return <ChallengeClient params={resolvedParams} />;
 }
