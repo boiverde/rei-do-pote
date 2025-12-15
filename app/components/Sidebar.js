@@ -44,6 +44,11 @@ export default function Sidebar() {
                     <span className={styles.icon}>🏆</span>
                     <span className={styles.label}>Ranking</span>
                 </Link>
+
+                <Link href="/challenges" className={`${styles.menuItem} ${styles.challenges}`}>
+                    <span className={styles.icon}>🥊</span>
+                    <span className={styles.label}>Desafios X1 <span className={styles.badge} style={{ background: '#ef4444', color: 'white' }}>Novo</span></span>
+                </Link>
             </div>
 
             {/* Dynamic Leagues */}
