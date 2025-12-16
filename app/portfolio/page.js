@@ -4,6 +4,7 @@ import { createClient } from '../utils/supabase/client';
 import Link from 'next/link';
 import styles from './page.module.css';
 import dynamic from 'next/dynamic';
+import { formatCurrency } from '@/utils/format';
 
 import Skeleton from '../components/Skeleton';
 
@@ -96,7 +97,7 @@ export default function Portfolio() {
                 const cost = pos.shares * pos.avg_price;
                 const currentValue = pos.shares * currentPrice;
                 const profit = currentValue - cost;
-                const returnStr = `${profit >= 0 ? '+' : '-'}R$ ${Math.abs(profit).toFixed(2)}`;
+                const returnStr = `${profit >= 0 ? '+' : ''}${formatCurrency(profit)}`;
 
                 return {
                     id: pos.market_id,
@@ -146,25 +147,25 @@ export default function Portfolio() {
 
             <div className={styles.balanceCard}>
                 <div className={styles.balanceHeader}>
-                    <span>Saldo Disponível</span>
+                    <span>Meus Tesouros</span>
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <Link href="/withdraw" className={styles.withdrawBtn}>
-                            - Sacar
+                            Trocar
                         </Link>
                         <Link href="/deposit" className={styles.depositBtn}>
-                            + Depositar
+                            + Loja
                         </Link>
                     </div>
                 </div>
-                <div className={styles.balanceAmount}>R$ {balance.toFixed(2).replace('.', ',')}</div>
-                <div className={styles.balanceMeta}>Investido: R$ {totalInvested.toFixed(2).replace('.', ',')}</div>
+                <div className={styles.balanceAmount}>{formatCurrency(balance)}</div>
+                <div className={styles.balanceMeta}>Alocado: {formatCurrency(totalInvested)}</div>
 
                 <div className={styles.chartWrapper}>
                     <PortfolioChart data={historyData} />
                 </div>
             </div>
 
-            <div className={styles.sectionTitle}>Posições Abertas ({positions.length})</div>
+            <div className={styles.sectionTitle}>Meus Palpites ({positions.length})</div>
 
             <div className={styles.list}>
                 {positions.length > 0 ? (
@@ -178,7 +179,7 @@ export default function Portfolio() {
                             </div>
                             <div className={styles.posStats}>
                                 <div className={styles.stat}>
-                                    <span>Cotas</span>
+                                    <span>Qtd. Cotas</span>
                                     <strong>{pos.shares}</strong>
                                 </div>
                                 <div className={styles.stat}>
@@ -187,7 +188,7 @@ export default function Portfolio() {
                                 </div>
                                 <div className={styles.stat}>
                                     <span>Valor Total</span>
-                                    <strong>R$ {(pos.shares * pos.currentPrice).toFixed(2)}</strong>
+                                    <strong>{formatCurrency(pos.shares * pos.currentPrice)}</strong>
                                 </div>
                                 <div className={styles.stat}>
                                     <span>Retorno</span>
@@ -199,7 +200,7 @@ export default function Portfolio() {
                         </Link>
                     ))
                 ) : (
-                    <div className={styles.emptyState}>Você ainda não fez nenhum investimento.</div>
+                    <div className={styles.emptyState}>Você ainda não fez nenhum palpite.</div>
                 )}
             </div>
 
@@ -209,11 +210,11 @@ export default function Portfolio() {
                     transactions.map((tx) => (
                         <div key={tx.id} className={styles.transactionItem}>
                             <div className={styles.txInfo}>
-                                <span className={styles.txType}>{tx.type === 'deposit' ? 'Depósito' : 'Saque'}</span>
+                                <span className={styles.txType}>{tx.type === 'deposit' ? 'Compra (Loja)' : 'Troca por Reais'}</span>
                                 <span className={styles.txDate}>{new Date(tx.created_at).toLocaleDateString('pt-BR')}</span>
                             </div>
                             <div className={`${styles.txAmount} ${tx.type === 'deposit' ? styles.green : styles.red}`}>
-                                {tx.type === 'deposit' ? '+' : '-'} R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                                {tx.type === 'deposit' ? '+' : '-'} {formatCurrency(parseFloat(tx.amount))}
                             </div>
                         </div>
                     ))
