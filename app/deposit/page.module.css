@@ -12,8 +12,38 @@
     margin-bottom: 2rem;
     text-align: center;
     background: linear-gradient(45deg, #00ff88, #00ccff);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+.storeHeader {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.storeRate {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00ff88;
+    margin-bottom: 0.5rem;
+}
+
+.storeSubtitle {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+.sectionTitle {
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 .amountGrid {
@@ -32,14 +62,44 @@
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.crownIcon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+}
+
+.priceTag {
+    font-size: 0.9rem;
+    color: #aaa;
+    font-weight: 400;
 }
 
 .amountButton:hover,
 .amountButton.selected {
     background: rgba(0, 255, 136, 0.1);
     border-color: #00ff88;
-    color: #00ff88;
     transform: translateY(-2px);
+}
+
+.amountButton:hover .priceTag,
+.amountButton.selected .priceTag {
+    color: #00ff88;
+}
+
+.customAmountContainer {
+    margin-bottom: 2rem;
+}
+
+.customAmountContainer label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #aaa;
+    font-size: 0.9rem;
 }
 
 .customInput {
@@ -50,7 +110,14 @@
     border-radius: 12px;
     color: #fff;
     font-size: 1.1rem;
-    margin-bottom: 2rem;
+}
+
+.conversionPreview {
+    display: block;
+    margin-top: 0.5rem;
+    color: #00ff88;
+    font-size: 0.9rem;
+    text-align: right;
 }
 
 .payButton {

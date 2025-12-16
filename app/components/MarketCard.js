@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './MarketCard.module.css';
 import { useBetSlip } from '../context/BetSlipContext';
+import { formatCurrency } from '@/utils/format';
 
 export default function MarketCard({ match }) {
     const { addBet, bets, removeBet } = useBetSlip();
@@ -89,7 +90,7 @@ export default function MarketCard({ match }) {
                     className={`${styles.priceBtn} ${isSelected('home') ? styles.selected : ''}`}
                     onClick={() => handleToggle('home')}
                 >
-                    <span className={styles.value}>R$ {homePrice.toFixed(2)}</span>
+                    <span className={styles.value}>{formatCurrency(homePrice)}</span>
                 </button>
             </div>
 
@@ -107,7 +108,7 @@ export default function MarketCard({ match }) {
                     className={`${styles.priceBtn} ${isSelected('away') ? styles.selected : ''}`}
                     onClick={() => handleToggle('away')}
                 >
-                    <span className={styles.value}>R$ {awayPrice.toFixed(2)}</span>
+                    <span className={styles.value}>{formatCurrency(awayPrice)}</span>
                 </button>
             </div>
             {/* Pool Info */}

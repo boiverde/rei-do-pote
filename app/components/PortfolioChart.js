@@ -25,7 +25,7 @@ export default function PortfolioChart({ data }) {
                     />
                     <YAxis
                         hide={false}
-                        tickFormatter={(value) => `R$${value}`}
+                        tickFormatter={(value) => `👑${value}`}
                         stroke="#666675"
                         fontSize={12}
                         tickLine={false}
@@ -40,7 +40,7 @@ export default function PortfolioChart({ data }) {
                             color: '#fff'
                         }}
                         itemStyle={{ color: '#00e676' }}
-                        formatter={(value) => [`R$ ${value.toFixed(2)}`, "Saldo"]}
+                        formatter={(value) => [`👑 ${value.toFixed(2)}`, "Meus Tesouros"]}
                         labelStyle={{ color: '#a0a0b0', marginBottom: '4px' }}
                     />
                     <Area

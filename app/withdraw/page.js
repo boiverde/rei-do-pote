@@ -114,12 +114,15 @@ export default function WithdrawPage() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>Sacar Ganhos</h1>
+            <h1 className={styles.title}>Trocar Coroas</h1>
 
             <div className={styles.balanceCard}>
-                <div className={styles.balanceLabel}>Saldo Disponível</div>
+                <div className={styles.balanceLabel}>Seus Tesouros Disponíveis</div>
                 <div className={styles.balanceValue}>
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance)}
+                    👑 {balance ? balance.toFixed(0) : '0'}
+                </div>
+                <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '5px' }}>
+                    = R$ {balance ? balance.toFixed(2) : '0,00'}
                 </div>
             </div>
 
@@ -151,16 +154,21 @@ export default function WithdrawPage() {
                     // State 2: Withdrawal Form (Locked to CPF)
                     <form onSubmit={handleWithdraw}>
                         <div className={styles.inputGroup}>
-                            <label className={styles.label}>Valor do Saque (R$)</label>
+                            <label className={styles.label}>Quero trocar (Coroas) 👑</label>
                             <input
                                 type="number"
-                                step="0.01"
+                                step="1"
                                 className={styles.input}
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                placeholder="0,00"
+                                placeholder="0"
                                 required
                             />
+                            {amount > 0 && (
+                                <div className={styles.conversionPreview}>
+                                    Você recebe: <strong>R$ {amount},00</strong>
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.inputGroup}>
@@ -173,17 +181,16 @@ export default function WithdrawPage() {
                                 style={{ backgroundColor: '#e9ecef', color: '#666', cursor: 'not-allowed' }}
                             />
                             <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
-                                🔒 Por segurança, transferimos apenas para sua chave CPF.
+                                🔒 Transferimos apenas para sua chave CPF por segurança.
                             </small>
                         </div>
-                        {/* Hidden fields for compatibility if needed, but logic handles it */}
 
-                        <button type="submit" className={styles.button} disabled={loading || balance <= 0}>
-                            {loading ? 'Processando...' : 'Confirmar Saque'}
+                        <button type="submit" className={styles.button} disabled={loading || balance <= 0 || !amount}>
+                            {loading ? 'Processando Troca...' : 'Confirmar Troca'}
                         </button>
 
                         <p style={{ marginTop: '1rem', color: '#666', fontSize: '0.8rem', textAlign: 'center' }}>
-                            Taxa de saque: R$ 0,00. Prazo: até 24h úteis.
+                            Taxa de câmbio: 1:1. Prazo: até 24h úteis.
                         </p>
                     </form>
                 )}

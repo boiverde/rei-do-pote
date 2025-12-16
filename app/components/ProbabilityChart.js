@@ -22,7 +22,7 @@ export default function ProbabilityChart({ data, teamName }) {
                     <YAxis
                         hide={false}
                         domain={[0, 1]}
-                        tickFormatter={(value) => `R$${value.toFixed(2)}`}
+                        tickFormatter={(value) => `👑${value.toFixed(2)}`}
                         stroke="#666675"
                         fontSize={12}
                     />
@@ -33,7 +33,7 @@ export default function ProbabilityChart({ data, teamName }) {
                             borderRadius: '8px',
                             fontSize: '12px'
                         }}
-                        formatter={(value) => [`R$ ${value.toFixed(2)}`, teamName]}
+                        formatter={(value) => [`👑 ${value.toFixed(2)}`, teamName]}
                         labelStyle={{ color: '#a0a0b0' }}
                     />
                     <Area

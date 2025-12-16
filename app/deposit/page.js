@@ -67,10 +67,16 @@ export default function DepositPage() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>Depositar via PIX</h1>
+            <h1 className={styles.title}>Loja de Coroas</h1>
+
+            <div className={styles.storeHeader}>
+                <span className={styles.storeRate}>1 Coroa = R$ 1,00</span>
+                <p className={styles.storeSubtitle}>Adquira Coroas para dar seus palpites.</p>
+            </div>
 
             {!paymentData ? (
                 <>
+                    <h2 className={styles.sectionTitle}>Escolha um Pacote</h2>
                     <div className={styles.amountGrid}>
                         {[10, 20, 50, 100].map((val) => (
                             <button
@@ -78,30 +84,35 @@ export default function DepositPage() {
                                 className={`${styles.amountButton} ${amount == val ? styles.selected : ''}`}
                                 onClick={() => setAmount(val)}
                             >
-                                R$ {val}
+                                <span className={styles.crownIcon}>👑</span> {val}
+                                <span className={styles.priceTag}>R$ {val},00</span>
                             </button>
                         ))}
                     </div>
 
-                    <input
-                        type="number"
-                        placeholder="Outro valor (R$)"
-                        className={styles.customInput}
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                    />
+                    <div className={styles.customAmountContainer}>
+                        <label>Outra quantidade:</label>
+                        <input
+                            type="number"
+                            placeholder="Qtd. de Coroas"
+                            className={styles.customInput}
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                        />
+                        {amount > 0 && <span className={styles.conversionPreview}> = R$ {amount},00</span>}
+                    </div>
 
                     <button
                         className={styles.payButton}
                         onClick={handleDeposit}
                         disabled={loading || !amount}
                     >
-                        {loading ? 'Gerando PIX...' : 'Gerar PIX'}
+                        {loading ? 'Gerando Pagamento...' : `Comprar ${amount || 0} Coroas`}
                     </button>
                 </>
             ) : (
                 <div className={styles.qrContainer}>
-                    <p className={styles.qrInstruction}>Escaneie o QR Code no app do seu banco</p>
+                    <p className={styles.qrInstruction}>Escaneie o QR Code para finalizar sua compra</p>
 
                     <div className={styles.qrWrapper}>
                         <img
@@ -118,14 +129,14 @@ export default function DepositPage() {
                     </button>
 
                     <p className={styles.footerNote}>
-                        Após o pagamento, seu saldo será atualizado automaticamente em instantes.
+                        Suas Coroas serão creditadas automaticamente após o pagamento.
                     </p>
 
                     <button
                         className={styles.backButton}
                         onClick={() => setPaymentData(null)}
                     >
-                        ← Voltar / Novo Depósito
+                        ← Voltar para a Loja
                     </button>
                 </div>
             )}

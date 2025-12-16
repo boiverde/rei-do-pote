@@ -101,14 +101,14 @@ export default function BetSlip() {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                toast.error("Você precisa entrar para apostar!");
+                toast.error("Você precisa entrar para dar palpites!");
                 setLoading(false);
                 return;
             }
 
             const totalStake = getTotalStake();
             if (totalStake <= 0) {
-                toast.error("Insira um valor para apostar.");
+                toast.error("Insira um valor para o palpite.");
                 setLoading(false);
                 return;
             }
@@ -119,7 +119,7 @@ export default function BetSlip() {
                 if (amount <= 0) continue;
 
                 if (amount < 1) { // Minimum 1 real
-                    toast.error(`Valor mínimo de investimento: R$ 1,00`);
+                    toast.error(`Valor mínimo de investimento: 👑 1,00`);
                     continue;
                 }
 
@@ -134,7 +134,7 @@ export default function BetSlip() {
                 if (data && !data.success) throw new Error(data.message);
             }
 
-            toast.success("Aposta realizada com sucesso!");
+            toast.success("Palpite realizado com sucesso!");
             clearSlip();
             setAmounts({});
             setActiveTab('my-bets'); // Auto-switch to My Bets
@@ -142,7 +142,7 @@ export default function BetSlip() {
 
         } catch (error) {
             console.error(error);
-            toast.error("Erro ao realizar aposta: " + error.message);
+            toast.error("Erro ao realizar palpite: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -162,7 +162,7 @@ export default function BetSlip() {
                     className={`${styles.tab} ${activeTab === 'my-bets' ? styles.activeTab : ''}`}
                     onClick={() => setActiveTab('my-bets')}
                 >
-                    Minhas Apostas
+                    Meus Palpites
                 </button>
             </div>
 
@@ -173,7 +173,7 @@ export default function BetSlip() {
                             <div className={styles.emptyState}>
                                 <div className={styles.emptyIcon}>🎫</div>
                                 <p className={styles.emptyText}>Seu cupom está vazio</p>
-                                <p className={styles.emptySubtext}>Clique nas odds para adicionar uma aposta.</p>
+                                <p className={styles.emptySubtext}>Clique nas odds para adicionar um palpite.</p>
                             </div>
                         </div>
                     ) : (
@@ -189,14 +189,14 @@ export default function BetSlip() {
                                             >✕</button>
                                         </div>
                                         <div className={styles.betMatch}>{bet.matchStr}</div>
-                                        <div className={styles.betOdds}>Valor da Cota: R$ {bet.price.toFixed(2)}</div>
+                                        <div className={styles.betOdds}>Cota: {bet.price.toFixed(2)}</div>
 
                                         <div className={styles.stakeInputContainer}>
-                                            <span className={styles.currencyPrefix}>R$</span>
+                                            <span className={styles.currencyPrefix}>👑</span>
                                             <input
                                                 type="number"
                                                 className={styles.stakeInput}
-                                                placeholder="Valor"
+                                                placeholder="Qtd."
                                                 value={amounts[bet.id] || ''}
                                                 onChange={(e) => handleAmountChange(bet.id, e.target.value)}
                                             />
@@ -207,12 +207,12 @@ export default function BetSlip() {
 
                             <div className={styles.footer}>
                                 <div className={styles.summaryRow}>
-                                    <span>Total de Apostas</span>
-                                    <span>R$ {getTotalStake().toFixed(2)}</span>
+                                    <span>Total (Coroas)</span>
+                                    <span>👑 {getTotalStake().toFixed(2)}</span>
                                 </div>
                                 <div className={styles.summaryRow}>
-                                    <span>Retorno Potencial*</span>
-                                    <span className={styles.potentialWin}>R$ {getPotentialReturn().toFixed(2)}</span>
+                                    <span>Prêmio Estimado*</span>
+                                    <span className={styles.potentialWin}>👑 {getPotentialReturn().toFixed(2)}</span>
                                 </div>
                                 <div className={styles.feeDisclaimer}>
                                     *Deduzida taxa de serviço de 10%. Valor final depende do fechamento do pool.
@@ -222,7 +222,7 @@ export default function BetSlip() {
                                     onClick={handlePlaceBets}
                                     disabled={loading}
                                 >
-                                    {loading ? 'Processando...' : 'Fazer Aposta'}
+                                    {loading ? 'Processando...' : 'Confirmar Palpites'}
                                 </button>
                             </div>
                         </>
@@ -233,7 +233,7 @@ export default function BetSlip() {
                 <div className={styles.content}>
                     {myBets.length === 0 ? (
                         <div className={styles.emptyState}>
-                            <p className={styles.emptyText}>Nenhuma aposta ativa</p>
+                            <p className={styles.emptyText}>Nenhum palpite ativo</p>
                         </div>
                     ) : (
                         myBets.map((pos) => (
@@ -244,13 +244,13 @@ export default function BetSlip() {
                                             pos.outcome === 'away' ? pos.markets?.away_team :
                                                 pos.outcome}
                                     </span>
-                                    <span className={styles.sharesBadge}>{pos.shares} cotas</span>
+                                    <span className={styles.sharesBadge}>{pos.shares} palpites</span>
                                 </div>
                                 <div className={styles.betMatch}>
                                     {pos.markets?.home_team} x {pos.markets?.away_team}
                                 </div>
                                 <div className={styles.betMeta}>
-                                    <span>Investido: R$ {(pos.shares * pos.avg_price).toFixed(2)}</span>
+                                    <span>Alocado: 👑 {(pos.shares * pos.avg_price).toFixed(2)}</span>
                                 </div>
                             </div>
                         ))

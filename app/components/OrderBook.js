@@ -50,9 +50,9 @@ export default function OrderBook({ match, selectedSide }) {
                 <div className={styles.asks}>
                     {asks.map((order, i) => (
                         <div key={`ask-${i}`} className={styles.row}>
-                            <span className={styles.priceAsk}>R$ {order.price.toFixed(2)}</span>
+                            <span className={styles.priceAsk}>👑 {order.price.toFixed(2)}</span>
                             <span className={styles.qty}>{order.quantity}</span>
-                            <span className={styles.total}>R$ {(order.price * order.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            <span className={styles.total}>👑 {(order.price * order.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                             <div className={styles.depthBarAsk} style={{ width: `${(order.quantity / 5000) * 100}%` }}></div>
                         </div>
                     ))}
@@ -60,16 +60,16 @@ export default function OrderBook({ match, selectedSide }) {
 
                 {/* Current Spread/Price Indicator */}
                 <div className={styles.spread}>
-                    <span className={styles.spreadLabel}>Último Preço: R$ {basePrice.toFixed(2)}</span>
+                    <span className={styles.spreadLabel}>Último Preço: 👑 {basePrice.toFixed(2)}</span>
                 </div>
 
                 {/* Bids (Buys) - Green */}
                 <div className={styles.bids}>
                     {bids.map((order, i) => (
                         <div key={`bid-${i}`} className={styles.row}>
-                            <span className={styles.priceBid}>R$ {order.price.toFixed(2)}</span>
+                            <span className={styles.priceBid}>👑 {order.price.toFixed(2)}</span>
                             <span className={styles.qty}>{order.quantity}</span>
-                            <span className={styles.total}>R$ {(order.price * order.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            <span className={styles.total}>👑 {(order.price * order.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                             <div className={styles.depthBarBid} style={{ width: `${(order.quantity / 5000) * 100}%` }}></div>
                         </div>
                     ))}

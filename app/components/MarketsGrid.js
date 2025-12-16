@@ -34,7 +34,7 @@ async function getMarkets() {
         eventDate: m.event_date,
         homePrice: m.home_price,
         awayPrice: m.away_price,
-        volume: `R$ ${(m.volume / 1000).toFixed(1)}K`,
+        volume: `👑 ${(m.volume / 1000).toFixed(1)}K`,
         homePool: parseFloat(m.total_pool_home || 0),
         awayPool: parseFloat(m.total_pool_away || 0),
         feePercent: parseFloat(m.fee_percent || 0.10)

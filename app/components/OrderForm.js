@@ -16,7 +16,7 @@ export default function OrderForm({ match }) {
     const teamName = selectedSide === 'home' ? match.homeTeam : match.awayTeam;
 
     const cost = shares * price;
-    const potentialReturn = shares * 1.00; // Payout is always R$ 1.00 per share
+    const potentialReturn = shares * 1.00; // Payout is always 👑 1.00 per share
     const profit = potentialReturn - cost;
     const roi = (profit / cost) * 100;
 
@@ -47,7 +47,7 @@ export default function OrderForm({ match }) {
         }
 
         if (data && data.success) {
-            toast.success(`Compra realizada! Novo saldo: R$ ${data.new_balance.toFixed(2)}`);
+            toast.success(`Compra realizada! Novo saldo: 👑 ${data.new_balance.toFixed(2)}`);
             router.refresh();
             router.push('/portfolio');
         } else {
@@ -64,14 +64,14 @@ export default function OrderForm({ match }) {
                     onClick={() => setSelectedSide('home')}
                 >
                     <span className={styles.label}>{match.homeTeam}</span>
-                    <span className={styles.price}>R$ {match.homePrice.toFixed(2).replace('.', ',')}</span>
+                    <span className={styles.price}>👑 {match.homePrice.toFixed(2).replace('.', ',')}</span>
                 </button>
                 <button
                     className={`${styles.outcomeTab} ${selectedSide === 'away' ? styles.activeGreen : ''}`} // Both green for positive selection
                     onClick={() => setSelectedSide('away')}
                 >
                     <span className={styles.label}>{match.awayTeam}</span>
-                    <span className={styles.price}>R$ {match.awayPrice.toFixed(2).replace('.', ',')}</span>
+                    <span className={styles.price}>👑 {match.awayPrice.toFixed(2).replace('.', ',')}</span>
                 </button>
             </div>
 
@@ -92,19 +92,19 @@ export default function OrderForm({ match }) {
                 <div className={styles.summary}>
                     <div className={styles.row}>
                         <span>Preço por cota ({teamName})</span>
-                        <span>R$ {price.toFixed(2)}</span>
+                        <span>👑 {price.toFixed(2)}</span>
                     </div>
                     <div className={styles.row}>
                         <span>Custo Total</span>
-                        <span>R$ {cost.toFixed(2)}</span>
+                        <span>👑 {cost.toFixed(2)}</span>
                     </div>
                     <div className={styles.row}>
                         <span>Retorno Potencial</span>
-                        <span className={styles.green}>R$ {potentialReturn.toFixed(2)}</span>
+                        <span className={styles.green}>👑 {potentialReturn.toFixed(2)}</span>
                     </div>
                     <div className={styles.row}>
                         <span>Lucro Estimado</span>
-                        <span className={styles.green}>+R$ {profit.toFixed(2)} ({Math.floor(roi)}%)</span>
+                        <span className={styles.green}>+👑 {profit.toFixed(2)} ({Math.floor(roi)}%)</span>
                     </div>
                 </div>
 
@@ -116,7 +116,7 @@ export default function OrderForm({ match }) {
                     {loading ? 'Processando...' : `Comprar ${teamName}`}
                 </button>
                 <p className={styles.disclaimer}>
-                    Se {teamName} vencer, você recebe R$ 1,00 por cota.
+                    Se {teamName} vencer, você recebe 👑 1,00 por cota.
                 </p>
             </div>
         </div>
