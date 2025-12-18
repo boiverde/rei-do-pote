@@ -11,13 +11,18 @@ const FILTER_GROUPS = {
 };
 
 // Data Fetching logic
+// Data Fetching logic
 async function getMarkets() {
     const supabase = await createClient();
-    const nowISO = new Date().toISOString();
+
+    // Allow games from 4 hours ago (to show Live games)
+    const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+
     const { data, error } = await supabase
         .from('markets')
         .select('*')
-        .gt('event_date', nowISO) // Only future events
+        //.gt('event_date', nowISO) // Old strict filter
+        .gt('event_date', fourHoursAgo) // New relaxed filter
         .order('event_date', { ascending: true }); // Soonest first
 
     if (error) {
@@ -55,15 +60,11 @@ export default async function MarketsGrid({ group, league }) {
             if (match.league !== league) return false;
         }
 
-        // 2. Filter Past Events (Hide finished games)
-        const eventDate = new Date(match.eventDate);
-        const now = new Date();
-        // Add a buffer of ~2 hours for "Live" games to still show? 
-        // For now, strict inequality: if start time < now, it's started/past.
-        // Usually prediction markets close AT START time.
-        if (eventDate < now) {
-            return false;
-        }
+        // 2. Filter Past Events (Hide only REALLY old games, e.g. > 4h ago)
+        // We want to show "Live" games.
+        // const eventDate = new Date(match.eventDate);
+        // const now = new Date();
+        // if (eventDate < now) return false; // REMOVED strict check
 
         return true;
     });
