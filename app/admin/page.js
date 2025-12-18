@@ -220,7 +220,43 @@ export default function AdminPage() {
     if (loading) return <div className={styles.loading}>Verificando permissões...</div>;
 
     if (!isAuthorized) {
-        return <div className={styles.container}>Acesso Negado</div>;
+        const handleDevPromote = async () => {
+            if (!confirm('DEV ONLY: Promover seu usuário a Admin?')) return;
+            try {
+                const res = await fetch('/api/admin/dev-promote', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    toast.success('Promovido! Recarregando...');
+                    window.location.reload();
+                } else {
+                    toast.error('Erro: ' + data.error);
+                }
+            } catch (e) {
+                toast.error('Erro de conexão');
+            }
+        };
+
+        return (
+            <div className={styles.container} style={{ textAlign: 'center', marginTop: '50px' }}>
+                <h1>⛔ Acesso Negado</h1>
+                <p>Você não tem permissão de administrador.</p>
+                <button
+                    onClick={handleDevPromote}
+                    style={{
+                        marginTop: '20px',
+                        padding: '10px 20px',
+                        background: '#333',
+                        color: '#fbbf24',
+                        border: '1px border #fbbf24',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    🛠️ DEV: Promover a Admin
+                </button>
+            </div>
+        );
     }
 
     return (
