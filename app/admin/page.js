@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import TableSkeleton from '../components/TableSkeleton';
 
 export default function AdminPage() {
+    const supabase = createClient();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(false);
@@ -14,7 +15,6 @@ export default function AdminPage() {
     const [syncing, setSyncing] = useState(false); // Fix: Add missing state
 
     const [submitMessage, setSubmitMessage] = useState(null);
-    const [debugInfo, setDebugInfo] = useState(null);
 
     // Withdrawal State
     const [withdrawals, setWithdrawals] = useState([]);
@@ -32,7 +32,6 @@ export default function AdminPage() {
     });
 
     // 1. Check Admin Status
-    // 1. Check Admin Status
     useEffect(() => {
         const checkAdmin = async () => {
             try {
@@ -42,30 +41,19 @@ export default function AdminPage() {
                     return;
                 }
 
-                console.log("Checking admin for user:", session.user.id);
-
                 const { data: profile, error } = await supabase
                     .from('profiles')
                     .select('is_admin')
                     .eq('id', session.user.id)
                     .single();
 
-                if (error) {
-                    console.error("Profile Fetch Error:", error);
-                    setDebugInfo({ error: error.message, stage: 'fetch_profile' });
-                    setIsAuthorized(false);
-                } else if (!profile) {
-                    setDebugInfo({ error: 'Profile not found in DB', stage: 'profile_null' });
-                    setIsAuthorized(false);
-                } else if (!profile.is_admin) {
-                    setDebugInfo({ error: 'is_admin is false', stage: 'permission_check', profile });
+                if (error || !profile || !profile.is_admin) {
                     setIsAuthorized(false);
                 } else {
                     setIsAuthorized(true);
                 }
             } catch (err) {
                 console.error("Admin check failed", err);
-                setDebugInfo({ error: err.message, stage: 'try_catch' });
                 setIsAuthorized(false);
             } finally {
                 setLoading(false);
