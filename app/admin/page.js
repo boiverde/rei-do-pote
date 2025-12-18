@@ -14,6 +14,7 @@ export default function AdminPage() {
     const [syncing, setSyncing] = useState(false); // Fix: Add missing state
 
     const [submitMessage, setSubmitMessage] = useState(null);
+    const [debugInfo, setDebugInfo] = useState(null);
 
     // Withdrawal State
     const [withdrawals, setWithdrawals] = useState([]);
@@ -31,6 +32,7 @@ export default function AdminPage() {
     });
 
     // 1. Check Admin Status
+    // 1. Check Admin Status
     useEffect(() => {
         const checkAdmin = async () => {
             try {
@@ -40,19 +42,30 @@ export default function AdminPage() {
                     return;
                 }
 
+                console.log("Checking admin for user:", session.user.id);
+
                 const { data: profile, error } = await supabase
                     .from('profiles')
                     .select('is_admin')
                     .eq('id', session.user.id)
                     .single();
 
-                if (error || !profile || !profile.is_admin) {
+                if (error) {
+                    console.error("Profile Fetch Error:", error);
+                    setDebugInfo({ error: error.message, stage: 'fetch_profile' });
+                    setIsAuthorized(false);
+                } else if (!profile) {
+                    setDebugInfo({ error: 'Profile not found in DB', stage: 'profile_null' });
+                    setIsAuthorized(false);
+                } else if (!profile.is_admin) {
+                    setDebugInfo({ error: 'is_admin is false', stage: 'permission_check', profile });
                     setIsAuthorized(false);
                 } else {
                     setIsAuthorized(true);
                 }
             } catch (err) {
                 console.error("Admin check failed", err);
+                setDebugInfo({ error: err.message, stage: 'try_catch' });
                 setIsAuthorized(false);
             } finally {
                 setLoading(false);
@@ -229,10 +242,12 @@ export default function AdminPage() {
                     toast.success('Promovido! Recarregando...');
                     window.location.reload();
                 } else {
-                    toast.error('Erro: ' + data.error);
+                    toast.error('Erro: ' + (data.error || 'Erro desconhecido'));
+                    setDebugInfo(prev => ({ ...prev, apiError: data.error }));
                 }
             } catch (e) {
                 toast.error('Erro de conexão');
+                setDebugInfo(prev => ({ ...prev, apiError: e.message }));
             }
         };
 
@@ -240,21 +255,30 @@ export default function AdminPage() {
             <div className={styles.container} style={{ textAlign: 'center', marginTop: '50px' }}>
                 <h1>⛔ Acesso Negado</h1>
                 <p>Você não tem permissão de administrador.</p>
-                <button
-                    onClick={handleDevPromote}
-                    style={{
-                        marginTop: '20px',
-                        padding: '10px 20px',
-                        background: '#333',
-                        color: '#fbbf24',
-                        border: '1px border #fbbf24',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold'
-                    }}
-                >
-                    🛠️ DEV: Promover a Admin
-                </button>
+
+                {debugInfo && (
+                    <div style={{ marginTop: '20px', padding: '10px', background: '#330000', color: '#ffaaaa', borderRadius: '5px', textAlign: 'left', display: 'inline-block' }}>
+                        <strong>Debug Info:</strong>
+                        <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+                    </div>
+                )}
+
+                <div style={{ marginTop: '20px' }}>
+                    <button
+                        onClick={handleDevPromote}
+                        style={{
+                            padding: '10px 20px',
+                            background: '#333',
+                            color: '#fbbf24',
+                            border: '1px solid #fbbf24',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        🛠️ DEV: Promover a Admin
+                    </button>
+                </div>
             </div>
         );
     }
