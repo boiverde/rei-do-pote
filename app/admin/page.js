@@ -245,12 +245,12 @@ export default function AdminPage() {
                 <p>Você não tem permissão de administrador.</p>
 
                 {debugInfo && (
-                    <div style={{ marginTop: '20px', padding: '10px', background: '#330000', color: '#ffaaaa', borderRadius: '5px', textAlign: 'left', display: 'inline-block' }}>
+                    <div style={{ marginTop: '20px', padding: '10px', background: '#330000', color: '#ffaaaa', borderRadius: '5px', textAlign: 'left', display: 'inline-block', maxWidth: '800px', overflowX: 'auto' }}>
                         <strong>Debug Info:</strong>
                         <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+                        <button onClick={() => setDebugInfo(null)} style={{ marginTop: '10px', padding: '5px' }}>Fechar Debug</button>
                     </div>
                 )}
-
                 <div style={{ marginTop: '20px' }}>
                     <button
                         onClick={handleDevPromote}
@@ -271,11 +271,38 @@ export default function AdminPage() {
         );
     }
 
+    // --- AUTHENTICATED ADMIN VIEW ---
+
+    const handleDebugAPI = async () => {
+        setSyncing(true);
+        try {
+            const res = await fetch('/api/debug-sync');
+            const data = await res.json();
+            // Show result in a toast or console, or better: set a state to show a modal
+            // For now, let's reuse a simple display area or console
+            console.log("DEBUG DATA:", data);
+
+            // Format for display
+            const formatted = data.matches.map(m =>
+                `[${m.league_id}] ${m.league}: ${m.home} vs ${m.away} (${m.date})`
+            ).join('\n');
+
+            alert(`Jogos Encontrados (Copa/Brasil):\n\n${formatted}`);
+        } catch (e) {
+            alert('Erro debug: ' + e.message);
+        } finally {
+            setSyncing(false);
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <h1 className={styles.title}>Painel Admin 👮‍♂️</h1>
-                <div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={handleDebugAPI} disabled={syncing} style={{ background: '#444', color: '#fff', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>
+                        🔍 Debug API
+                    </button>
                     <button onClick={handleSync} disabled={syncing} className={styles.syncBtn}>
                         {syncing ? '...' : '🔄 Buscar Jogos'}
                     </button>
