@@ -29,7 +29,7 @@ async function getMarkets() {
         console.error('Error fetching markets:', error);
         return [];
     }
-    return data.map(m => ({
+    return (data || []).map(m => ({
         id: m.id,
         homeTeam: m.home_team,
         awayTeam: m.away_team,
@@ -47,37 +47,50 @@ async function getMarkets() {
 }
 
 export default async function MarketsGrid({ group, league }) {
-    const matches = await getMarkets();
+    try {
+        const matches = await getMarkets();
 
-    // Filter Logic
-    const filteredMatches = matches.filter(match => {
-        // 1. Filter by Group/League
-        if (group !== "Todos") {
-            const groupLeagues = FILTER_GROUPS[group] || [];
-            if (!groupLeagues.includes(match.league)) return false;
+        // Filter Logic
+        const filteredMatches = matches.filter(match => {
+            // 1. Filter by Group/League
+            if (group !== "Todos") {
+                const groupLeagues = FILTER_GROUPS[group] || [];
+                if (!groupLeagues.includes(match.league)) return false;
+            }
+            if (league) {
+                if (match.league !== league) return false;
+            }
+
+            // 2. Filter Past Events (Hide only REALLY old games, e.g. > 4h ago)
+            // We want to show "Live" games.
+            // const eventDate = new Date(match.eventDate);
+            // const now = new Date();
+            // if (eventDate < now) return false; // REMOVED strict check
+
+            return true;
+        });
+
+        if (filteredMatches.length === 0) {
+            return <LandingHero />;
         }
-        if (league) {
-            if (match.league !== league) return false;
-        }
 
-        // 2. Filter Past Events (Hide only REALLY old games, e.g. > 4h ago)
-        // We want to show "Live" games.
-        // const eventDate = new Date(match.eventDate);
-        // const now = new Date();
-        // if (eventDate < now) return false; // REMOVED strict check
-
-        return true;
-    });
-
-    if (filteredMatches.length === 0) {
-        return <LandingHero />;
+        return (
+            <>
+                {filteredMatches.map((match) => (
+                    <MarketCard key={match.id} match={match} />
+                ))}
+            </>
+        );
+    } catch (error) {
+        console.error("MarketsGrid Critical Error:", error);
+        return (
+            <div style={{ padding: '20px', color: '#ff6b6b', textAlign: 'center' }}>
+                <h3>Erro ao carregar mercado</h3>
+                <p>{error.message}</p>
+                <pre style={{ textAlign: 'left', background: '#330000', padding: '10px', overflow: 'auto' }}>
+                    {error.stack}
+                </pre>
+            </div>
+        );
     }
-
-    return (
-        <>
-            {filteredMatches.map((match) => (
-                <MarketCard key={match.id} match={match} />
-            ))}
-        </>
-    );
 }
