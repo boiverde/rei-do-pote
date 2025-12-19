@@ -278,16 +278,24 @@ export default function AdminPage() {
         try {
             const res = await fetch('/api/debug-sync');
             const data = await res.json();
-            // Show result in a toast or console, or better: set a state to show a modal
-            // For now, let's reuse a simple display area or console
+
             console.log("DEBUG DATA:", data);
 
-            // Format for display
-            const formatted = data.matches.map(m =>
-                `[${m.league_id}] ${m.league}: ${m.home} vs ${m.away} (${m.date})`
-            ).join('\n');
+            // Check for relevant matches or fallback to leagues
+            const matches = data.relevant_matches || [];
 
-            alert(`Jogos Encontrados (Copa/Brasil):\n\n${formatted}`);
+            if (matches.length > 0) {
+                // If specific matches found, show them
+                const formatted = matches.map(m =>
+                    `[${m.league_id}] ${m.league}: ${m.home} vs ${m.away} (${m.status})`
+                ).join('\n');
+                alert(`Jogos Encontrados (Copa/Brasil):\n\n${formatted}`);
+            } else {
+                // No matches? Show leagues to see if coverage exists
+                const formatsLeagues = (data.leagues_found || []).join('\n');
+                alert(`Nenhum jogo 'Vasco/Corinthians' encontrado.\n\nLigas Ativas no Domingo:\n${formatsLeagues}`);
+            }
+
         } catch (e) {
             alert('Erro debug: ' + e.message);
         } finally {
