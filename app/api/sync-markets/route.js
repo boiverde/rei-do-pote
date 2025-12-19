@@ -85,23 +85,49 @@ export async function POST(request) {
         const LEAGUES_INTL_SA = [13, 11, 15]; // Liberta, Sula, Mundial -> KEEP IF BR TEAM INVOLVED
         const LEAGUES_EURO = [39, 140, 2]; // Premier, La Liga, Champions -> KEEP IF CLASSIC (BOTH GIANTS)
 
+        // Helper to match partial names strategies
+        const isBigTeam = (teamName) => {
+            if (!teamName) return false;
+            // Direct Match
+            if (BIG_TEAMS.includes(teamName)) return true;
+            // Partial Match (e.g. API "Vasco" vs List "Vasco da Gama")
+            return BIG_TEAMS.some(t =>
+                teamName.includes(t) || t.includes(teamName) ||
+                teamName.toLowerCase().includes(t.toLowerCase()) ||
+                t.toLowerCase().includes(teamName.toLowerCase())
+            );
+        };
+
+        const isEuroGiant = (teamName) => {
+            if (!teamName) return false;
+            return EURO_GIANTS.includes(teamName) || EURO_GIANTS.some(t => teamName.includes(t) || t.includes(teamName));
+        };
+
         // Filter Logic:
         const filteredMatches = allMatches.filter(match => {
             const leagueId = match.league.id;
 
-            // 1. If it is one of our TARGET leagues, KEEP IT.
-            // We want ALL games from the leagues we cover, not just "big matches".
-            if (targetLeagueIds.includes(leagueId)) {
-                return true;
+            // 1. National (BR) - Always keep
+            if (LEAGUES_BR.includes(leagueId)) return true;
+
+            // 2. Intl South America (Liberta/Sula/Mundial) - Keep if BR team involved
+            if (LEAGUES_INTL_SA.includes(leagueId)) {
+                return isBigTeam(match.teams.home.name) || isBigTeam(match.teams.away.name);
             }
 
-            // 2. Extra Safety: Keep matches involving BR Big Teams found in other leagues (State leagues etc)
-            // This is useful if we accidentally fetch a state tournament via date search
-            const homeBig = BIG_TEAMS.includes(match.teams.home.name);
-            const awayBig = BIG_TEAMS.includes(match.teams.away.name);
-            if (homeBig || awayBig) return true;
+            // 3. Europe (Premier, La Liga) - Keep IF Classic (BOTH must be Giants)
+            if ([39, 140].includes(leagueId)) {
+                return isEuroGiant(match.teams.home.name) && isEuroGiant(match.teams.away.name);
+            }
 
-            return false;
+            // 4. Champions League (ID 2) - KEEP ALL (It's elite by definition)
+            if (leagueId === 2) return true;
+
+            // 5. Regionals/State/Others (Fallback) - Keep if BR Big Team involved
+            // If it's the Copa Final but under a weird ID, this will catch it if teams are matched correctly.
+            const homeBig = isBigTeam(match.teams.home.name);
+            const awayBig = isBigTeam(match.teams.away.name);
+            return homeBig || awayBig;
         });
 
         // Initialize Supabase Client (Restored)
