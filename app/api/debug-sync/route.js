@@ -36,8 +36,9 @@ export async function GET(request) {
 
         return NextResponse.json({
             target_date: targetDate,
+            raw_response: data, // INCLUDE FULL RESPONSE TO CHECK FOR ERRORS
             total_games_found: fixtures.length,
-            leagues_found: leagues.slice(0, 50), // Increased list size
+            leagues_found: leagues.slice(0, 50),
             relevant_matches: specificMatches
         });
 
