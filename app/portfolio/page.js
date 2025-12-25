@@ -20,25 +20,25 @@ export default function Portfolio() {
     // Mock History Data (Keep for visual until we have real history table)
     const [historyData, setHistoryData] = useState([]);
 
-    // Mock History Data (Keep for visual until we have real history table)
-    const generateBalanceHistory = () => {
-        const history = [];
-        let currentBalance = 900;
-        const today = new Date();
-        for (let i = 30; i >= 0; i--) {
-            const date = new Date(today);
-            date.setDate(date.getDate() - i);
-            const change = (Math.random() - 0.4) * 50;
-            currentBalance += change;
-            history.push({
-                date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-                balance: parseFloat(currentBalance.toFixed(2))
-            });
-        }
-        return history;
-    };
-
     useEffect(() => {
+        // Mock History Data (Keep for visual until we have real history table)
+        const generateBalanceHistory = () => {
+            const history = [];
+            let currentBalance = 900;
+            const today = new Date();
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const change = (Math.random() - 0.4) * 50;
+                currentBalance += change;
+                history.push({
+                    date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                    balance: parseFloat(currentBalance.toFixed(2))
+                });
+            }
+            return history;
+        };
+
         setHistoryData(generateBalanceHistory());
     }, []);
 

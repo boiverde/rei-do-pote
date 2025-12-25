@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { createClient } from '../utils/supabase/client';
 import styles from './page.module.css';
 
@@ -8,24 +9,24 @@ export default function RankingPage() {
     const [leaders, setLeaders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    async function fetchLeaders() {
-        setLoading(true);
-        // Simple Leaderboard: Top Balances
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('username, full_name, avatar_url, balance')
-            .order('balance', { ascending: false })
-            .limit(10);
-
-        if (error) {
-            console.error(error);
-        } else {
-            setLeaders(data || []);
-        }
-        setLoading(false);
-    }
-
     useEffect(() => {
+        async function fetchLeaders() {
+            setLoading(true);
+            // Simple Leaderboard: Top Balances
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('username, full_name, avatar_url, balance')
+                .order('balance', { ascending: false })
+                .limit(10);
+
+            if (error) {
+                console.error(error);
+            } else {
+                setLeaders(data || []);
+            }
+            setLoading(false);
+        }
+
         fetchLeaders();
     }, []);
 
@@ -42,7 +43,7 @@ export default function RankingPage() {
                         <div key={index} className={`${styles.item} ${index < 3 ? styles.top3 : ''}`}>
                             <div className={styles.rank}>#{index + 1}</div>
                             <div className={styles.avatar}>
-                                {user.avatar_url ? <img src={user.avatar_url} /> : <div className={styles.placeholder}>👤</div>}
+                                {user.avatar_url ? <Image src={user.avatar_url} alt={user.username || 'User'} width={40} height={40} className={styles.avatarImg} /> : <div className={styles.placeholder}>👤</div>}
                             </div>
                             <div className={styles.info}>
                                 <div className={styles.name}>{user.username || user.full_name || 'Anônimo'}</div>

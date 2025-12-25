@@ -104,7 +104,7 @@ export default function Navbar() {
             <div className={`container ${styles.container}`}>
                 <div className={styles.logo}>
                     <Link href="/" className={styles.logoLink}>
-                        <img src="/logo.png" alt="Rei do Pote" className={styles.logoImage} />
+                        <Image src="/logo.png" alt="Rei do Pote" width={32} height={32} className={styles.logoImage} />
                         <span className={styles.logoText}>Rei do Pote</span>
                     </Link>
                 </div>
@@ -143,9 +143,11 @@ export default function Navbar() {
                             <div className={styles.profile}>
                                 <Link href="/profile" className={styles.profileLink} title="Meu Perfil">
                                     {user.user_metadata?.avatar_url ? (
-                                        <img
+                                        <Image
                                             src={user.user_metadata.avatar_url}
                                             alt="Avatar"
+                                            width={32}
+                                            height={32}
                                             className={styles.avatar}
                                         />
                                     ) : (

@@ -6,29 +6,24 @@ export default function OrderBook({ match, selectedSide }) {
     const [asks, setAsks] = useState([]);
     const [bids, setBids] = useState([]);
 
-    // Mock data generator for order book
-    const generateOrders = (basePrice, isBuy) => {
-        const orders = [];
-        let currentPrice = basePrice;
-        for (let i = 0; i < 5; i++) {
-            // Price variations
-            const priceStep = 0.01;
-            currentPrice = isBuy ? currentPrice - priceStep : currentPrice + priceStep;
-
-            // Volume variations
-            const quantity = Math.floor(Math.random() * 5000) + 100;
-
-            orders.push({ price: currentPrice, quantity });
-        }
-        return orders;
-    };
-
-    const teamName = selectedSide === 'home' ? match.homeTeam : match.awayTeam;
-    const basePrice = selectedSide === 'home' ? match.homePrice : match.awayPrice;
-
-    // Removed sync declaration to avoid conflict with state
-
     useEffect(() => {
+        // Mock data generator for order book
+        const generateOrders = (basePrice, isBuy) => {
+            const orders = [];
+            let currentPrice = basePrice;
+            for (let i = 0; i < 5; i++) {
+                // Price variations
+                const priceStep = 0.01;
+                currentPrice = isBuy ? currentPrice - priceStep : currentPrice + priceStep;
+
+                // Volume variations
+                const quantity = Math.floor(Math.random() * 5000) + 100;
+
+                orders.push({ price: currentPrice, quantity });
+            }
+            return orders;
+        };
+
         // Generate mock bids (Buys) and Asks (Sells) around the current price
         // This is now Client-Side only, preventing hydration mismatch
         setAsks(generateOrders(basePrice, false).reverse());

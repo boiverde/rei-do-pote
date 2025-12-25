@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { createClient } from '../../utils/supabase/client';
 import { toast } from 'sonner';
 import styles from '../page.module.css'; // Reusing admin styles
@@ -95,7 +96,7 @@ export default function UsersAdmin() {
                                     <td style={{ padding: '12px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                             {user.avatar_url ? (
-                                                <img src={user.avatar_url} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+                                                <Image src={user.avatar_url} alt="User" width={24} height={24} style={{ borderRadius: '50%' }} />
                                             ) : (
                                                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#333' }} />
                                             )}

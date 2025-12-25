@@ -1,0 +1,9 @@
+﻿{
+    "success":  true,
+    "message":  "3 jogos sincronizados e atualizados!",
+    "games":  [
+                  "Tottenham x Liverpool (Premier League)",
+                  "Real Madrid x Sevilla (La Liga)",
+                  "Vasco DA Gama x Corinthians (Copa do Brasil)"
+              ]
+}

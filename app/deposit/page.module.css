@@ -246,3 +246,37 @@
     opacity: 1;
     text-decoration: none;
 }
+
+.warningContainer {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.warningText {
+    color: #ffc107;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.profileLink {
+    display: inline-block;
+    background: #ffc107;
+    color: #000;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.profileLink:hover {
+    background: #ffdb4d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}

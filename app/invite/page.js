@@ -32,6 +32,10 @@ export default function InvitePage() {
         setLoading(false);
     };
 
+    useEffect(() => {
+        fetchReferralData();
+    }, []);
+
     const handleCopy = () => {
         const link = `${window.location.origin}/login?ref=${referralCode}`;
         navigator.clipboard.writeText(link);

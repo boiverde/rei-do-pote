@@ -15,6 +15,26 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Unauthorized', details: 'Você precisa estar logado para depositar.' }, { status: 401 });
         }
 
+        console.log('User ID for Deposit:', user.id);
+
+        // Verify if user has CPF in profile
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('cpf')
+            .eq('id', user.id)
+            .single();
+
+        console.log('Profile Fetch Result:', { profile, profileError });
+        console.log('CPF Value:', profile?.cpf);
+
+        if (!profile?.cpf) {
+            console.log('Blocking deposit due to missing CPF');
+            return NextResponse.json({
+                error: 'CPF Required',
+                details: 'É necessário verificar seu CPF no perfil antes de fazer um depósito.'
+            }, { status: 400 });
+        }
+
         const { amount, description } = await request.json();
 
         if (!amount) {

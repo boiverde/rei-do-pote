@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { createClient } from '../utils/supabase/client';
 import styles from './page.module.css';
 import { toast } from 'sonner';
@@ -12,10 +13,24 @@ export default function DepositPage() {
     const [paymentData, setPaymentData] = useState(null);
     const [user, setUser] = useState(null);
 
+    const [hasCpf, setHasCpf] = useState(true); // Default true to avoid flash, validated in effect
+
     useEffect(() => {
         const getUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
+
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('cpf')
+                    .eq('id', user.id)
+                    .single();
+
+                if (!profile?.cpf) {
+                    setHasCpf(false);
+                }
+            }
         };
         getUser();
     }, []);
@@ -23,6 +38,10 @@ export default function DepositPage() {
     const handleDeposit = async () => {
         if (!user) {
             toast.error("Você precisa estar logado.");
+            return;
+        }
+        if (!hasCpf) {
+            toast.error("Você precisa verificar seu CPF no perfil.");
             return;
         }
         if (!amount || isNaN(amount) || Number(amount) <= 0) {
@@ -74,7 +93,16 @@ export default function DepositPage() {
                 <p className={styles.storeSubtitle}>Adquira Coroas para dar seus palpites.</p>
             </div>
 
-            {!paymentData ? (
+            {!hasCpf ? (
+                <div className={styles.warningContainer}>
+                    <p className={styles.warningText}>
+                        ⚠️ Para sua segurança, é necessário verificar seu CPF antes de fazer um depósito.
+                    </p>
+                    <a href="/profile" className={styles.profileLink}>
+                        Ir para Meu Perfil e Verificar CPF →
+                    </a>
+                </div>
+            ) : !paymentData ? (
                 <>
                     <h2 className={styles.sectionTitle}>Escolha um Pacote</h2>
                     <div className={styles.amountGrid}>
@@ -115,9 +143,11 @@ export default function DepositPage() {
                     <p className={styles.qrInstruction}>Escaneie o QR Code para finalizar sua compra</p>
 
                     <div className={styles.qrWrapper}>
-                        <img
+                        <Image
                             src={`data:image/png;base64,${paymentData.qr_code_base64}`}
                             alt="PIX QR Code"
+                            width={256}
+                            height={256}
                             className={styles.qrImage}
                         />
                     </div>
