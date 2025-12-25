@@ -10,8 +10,8 @@ const payment = new Payment(client);
 function verifySignature(request, queryId) {
     const secret = process.env.MP_WEBHOOK_SECRET;
     if (!secret) {
-        console.warn("⚠️ MP_WEBHOOK_SECRET missing. Skipping signature verification.");
-        return true; // Allow for now to not break prod, but warn
+        console.error("❌ CRTICIAL: MP_WEBHOOK_SECRET is missing.");
+        return false; // Fail secure
     }
 
     const xSignature = request.headers.get('x-signature');
