@@ -12,11 +12,11 @@ export default function RankingPage() {
     useEffect(() => {
         async function fetchLeaders() {
             setLoading(true);
-            // Simple Leaderboard: Top Balances
+            // Leaderboard: Top Winnings (Ranking Score)
             const { data, error } = await supabase
                 .from('profiles')
-                .select('username, full_name, avatar_url, balance')
-                .order('balance', { ascending: false })
+                .select('username, full_name, avatar_url, ranking_score')
+                .order('ranking_score', { ascending: false })
                 .limit(10);
 
             if (error) {
@@ -47,7 +47,7 @@ export default function RankingPage() {
                             </div>
                             <div className={styles.info}>
                                 <div className={styles.name}>{user.username || user.full_name || 'Anônimo'}</div>
-                                <div className={styles.balance}>R$ {user.balance?.toFixed(2)}</div>
+                                <div className={styles.balance}>🏆 {user.ranking_score?.toFixed(2) || '0.00'} pts</div>
                             </div>
                             {index === 0 && <div className={styles.medal}>🥇</div>}
                             {index === 1 && <div className={styles.medal}>🥈</div>}
